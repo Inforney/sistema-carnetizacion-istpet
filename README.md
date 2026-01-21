@@ -1,0 +1,137 @@
+# 🎓 Sistema de Carnetización y Control de Accesos - ISTPET
+
+Sistema web desarrollado en Laravel para la gestión de carnets digitales y control de accesos a laboratorios del Instituto Superior Tecnológico Mayor Pedro Traversari.
+
+## 🚀 Características
+
+- ✅ Generación de carnets digitales con QR
+- ✅ Control de accesos a laboratorios
+- ✅ Registro de asistencia automático
+- ✅ Gestión de estudiantes, profesores y administradores
+- ✅ Estadísticas y reportes
+- ✅ Sistema multi-usuario con roles
+
+## 🛠️ Tecnologías
+
+- **Backend:** Laravel 11, PHP 8.2+
+- **Frontend:** Bootstrap 5, JavaScript
+- **Base de Datos:** MySQL 8.0
+- **Servidor Local:** XAMPP
+
+## 📦 Instalación
+
+### Requisitos previos
+
+- PHP 8.2+
+- Composer
+- MySQL
+- XAMPP (o similar)
+
+### Pasos de instalación
+
+1. **Clonar el repositorio**
+
+```bash
+git clone https://github.com/TU-USUARIO/sistema-carnetizacion-istpet.git
+cd sistema-carnetizacion-istpet
+```
+
+2. **Instalar dependencias**
+
+```bash
+composer install
+```
+
+3. **Configurar variables de entorno**
+
+```bash
+copy .env.example .env
+php artisan key:generate
+```
+
+4. **Editar .env con tus datos de BD**
+
+```
+DB_DATABASE=carnetizacion_istpet
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+5. **Importar base de datos**
+
+- Crear base de datos `carnetizacion_istpet` en phpMyAdmin
+- Importar archivo `database/carnetizacion_istpet.sql`
+
+6. **Crear enlace simbólico para storage**
+
+```bash
+php artisan storage:link
+```
+
+7. **Iniciar servidor**
+
+```bash
+php artisan serve
+```
+
+8. **Acceder al sistema**
+
+```
+http://127.0.0.1:8000
+```
+
+## 👥 Credenciales de Prueba
+
+### Administrador
+
+- Usuario: `admin`
+- Contraseña: `admin123`
+
+### Profesor
+
+- Usuario: `profesor1`
+- Contraseña: `profesor123`
+
+### Estudiante
+
+- Cédula: `1750123456`
+- Contraseña: `estudiante123`
+
+## 📂 Estructura del Proyecto
+
+```
+carnetizacion-istpet/
+├── app/
+│   ├── Http/Controllers/
+│   ├── Models/
+│   └── Middleware/
+├── database/
+│   ├── migrations/
+│   └── carnetizacion_istpet.sql
+├── resources/
+│   └── views/
+├── routes/
+│   └── web.php
+└── public/
+```
+
+## 🔐 Seguridad
+
+- Contraseñas encriptadas con Bcrypt
+- Protección CSRF en formularios
+- Middleware de autenticación por roles
+- Validación de datos en servidor
+
+## 👨‍💻 Autores
+
+- Kevin [Tu Apellido] - Desarrollo completo
+- [Compañero 1] - [Rol]
+- [Compañero 2] - [Rol]
+
+## 📄 Licencia
+
+Este proyecto fue desarrollado como proyecto académico para ISTPET.
+
+---
+
+**Desarrollado con ❤️ por estudiantes de Desarrollo de Software - ISTPET 2025**
