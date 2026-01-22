@@ -85,17 +85,17 @@ http://127.0.0.1:8000
 ### Administrador
 
 - Usuario: `admin`
-- Contraseña: `admin123`
+- Contraseña: `IstpetAdmin2026!`
 
 ### Profesor
 
-- Usuario: `profesor1`
-- Contraseña: `profesor123`
+- Usuario: `1711223344`
+- Contraseña: `Profesor2026!`
 
 ### Estudiante
 
-- Cédula: `1750123456`
-- Contraseña: `estudiante123`
+- Cédula: `1726429283`
+- Contraseña: `28112000k`
 
 ## 📂 Estructura del Proyecto
 
@@ -124,9 +124,9 @@ carnetizacion-istpet/
 
 ## 👨‍💻 Autores
 
-- Kevin [Tu Apellido] - Desarrollo completo
-- [Compañero 1] - [Rol]
-- [Compañero 2] - [Rol]
+- Kevin Huilca - Desarrollo completo
+- Matias Bedon - Ayudante
+- Ivan Ceron - Ayudante
 
 ## 📄 Licencia
 
