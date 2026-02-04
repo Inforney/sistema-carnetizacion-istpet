@@ -24,7 +24,7 @@
                     {{-- Foto --}}
                     <div class="text-center mb-3">
                         @if($carnet->usuario->foto_url)
-                        <img src="{{ asset('storage/' . $carnet->usuario->foto_url) }}"
+                        <img src="{{ asset($carnet->usuario->foto_url) }}"
                             class="rounded-circle border border-3 border-primary"
                             style="width: 150px; height: 150px; object-fit: cover;"
                             alt="Foto">
@@ -142,7 +142,7 @@
                                 @csrf
                                 <button type="submit"
                                     class="btn btn-warning w-100"
-                                    onclick="return confirm('¿Renovar este carnet por 4 años más?')">
+                                    onclick="return confirm('¿Renovar este carnet por 1 año más (2 periodos académicos)?')">
                                     <i class="bi bi-arrow-clockwise me-2"></i>Renovar Carnet
                                 </button>
                             </form>

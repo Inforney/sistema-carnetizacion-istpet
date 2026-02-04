@@ -5,7 +5,6 @@
 @section('content')
 <div class="container-fluid py-4">
 
-
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card shadow-sm">
@@ -32,7 +31,7 @@
 
                         {{-- Nombre --}}
                         <div class="mb-3">
-                            <label class="form-label">Nombre del Laboratorio *</label>
+                            <label class="form-label">Nombre *</label>
                             <input type="text"
                                 name="nombre"
                                 class="form-control @error('nombre') is-invalid @enderror"
@@ -40,6 +39,29 @@
                                 placeholder="Ej: Laboratorio de Redes"
                                 required>
                             @error('nombre')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        {{-- Tipo --}}
+                        <div class="mb-3">
+                            <label class="form-label">Tipo *</label>
+                            <select name="tipo"
+                                class="form-select @error('tipo') is-invalid @enderror"
+                                required>
+                                <option value="">Seleccione el tipo</option>
+                                <option value="laboratorio" {{ old('tipo', $laboratorio->tipo) == 'laboratorio' ? 'selected' : '' }}>
+                                    🔬 Laboratorio Técnico
+                                </option>
+                                <option value="aula_interactiva" {{ old('tipo', $laboratorio->tipo) == 'aula_interactiva' ? 'selected' : '' }}>
+                                    📚 Aula Interactiva
+                                </option>
+                            </select>
+                            <small class="text-muted">
+                                Laboratorios: Para prácticas técnicas con equipos especializados<br>
+                                Aulas Interactivas: Para clases teóricas con tecnología multimedia
+                            </small>
+                            @error('tipo')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>

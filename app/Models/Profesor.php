@@ -23,6 +23,11 @@ class Profesor extends Authenticatable
         'cedula',
         'correo',
         'celular',
+        'especialidad',
+        'fecha_ingreso',
+        'foto_url',
+        'horario',
+        'departamento',
         'estado',
         'password',
     ];

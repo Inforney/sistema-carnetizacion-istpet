@@ -69,7 +69,7 @@ class CarnetController extends Controller
             'usuario_id' => $usuario->id,
             'codigo_qr' => $codigoQr,
             'fecha_emision' => Carbon::now(),
-            'fecha_vencimiento' => Carbon::now()->addYears(4),
+            'fecha_vencimiento' => Carbon::now()->addYear(),
             'estado' => 'activo',
         ]);
 
@@ -100,7 +100,7 @@ class CarnetController extends Controller
                 'usuario_id' => $estudiante->id,
                 'codigo_qr' => $codigoQr,
                 'fecha_emision' => Carbon::now(),
-                'fecha_vencimiento' => Carbon::now()->addYears(4),
+                'fecha_vencimiento' => Carbon::now()->addYear(),
                 'estado' => 'activo',
             ]);
 
@@ -148,8 +148,14 @@ class CarnetController extends Controller
         try {
             $carnet = Carnet::with('usuario')->findOrFail($id);
 
+            // Dimensiones del carnet: 85.6mm x 135mm convertidos a puntos (1mm = 2.83465 points)
+            // Ancho: 85.6mm = 242.65 points, Alto: 135mm = 382.68 points
             $pdf = Pdf::loadView('admin.carnets.pdf-individual', compact('carnet'))
-                ->setPaper([0, 0, 226, 359], 'portrait');
+                ->setPaper([0, 0, 242.65, 382.68], 'portrait')
+                ->setOption('margin-top', 0)
+                ->setOption('margin-right', 0)
+                ->setOption('margin-bottom', 0)
+                ->setOption('margin-left', 0);
 
             return $pdf->download('carnet_' . $carnet->usuario->cedula . '.pdf');
         } catch (\Exception $e) {
@@ -183,10 +189,10 @@ class CarnetController extends Controller
 
         $carnet->update([
             'fecha_emision' => Carbon::now(),
-            'fecha_vencimiento' => Carbon::now()->addYears(4),
+            'fecha_vencimiento' => Carbon::now()->addYear(),
             'estado' => 'activo',
         ]);
 
-        return back()->with('success', 'Carnet renovado exitosamente por 4 años más.');
+        return back()->with('success', 'Carnet renovado exitosamente por 1 año más (2 periodos académicos).');
     }
 }

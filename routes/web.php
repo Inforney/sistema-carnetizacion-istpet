@@ -54,6 +54,20 @@ Route::post('/recuperar-password', [RegistroController::class, 'enviarRecuperaci
 
 Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
 
+
+
+    // Importación masiva
+    Route::prefix('importacion')->name('importacion.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\ImportacionController::class, 'index'])
+            ->name('index');
+
+        Route::post('/importar', [App\Http\Controllers\Admin\ImportacionController::class, 'importar'])
+            ->name('importar');
+
+        Route::get('/descargar-plantilla', [App\Http\Controllers\Admin\ImportacionController::class, 'descargarPlantilla'])
+            ->name('descargar-plantilla');
+    });
+
     // Dashboard
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
@@ -109,6 +123,11 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::put('/laboratorios/{id}', [AdminLaboratorioController::class, 'update'])->name('laboratorios.update');
     Route::delete('/laboratorios/{id}', [AdminLaboratorioController::class, 'destroy'])->name('laboratorios.destroy');
     Route::get('/laboratorios/{id}/qr', [AdminLaboratorioController::class, 'generarQR'])->name('laboratorios.generar-qr');
+
+    // Gestión de Profesores
+    Route::resource('profesores', App\Http\Controllers\Admin\ProfesorController::class);
+    Route::post('/profesores/{id}/toggle-estado', [App\Http\Controllers\Admin\ProfesorController::class, 'toggleEstado'])->name('profesores.toggle');
+    Route::post('/profesores/{id}/reset-password', [App\Http\Controllers\Admin\ProfesorController::class, 'resetPassword'])->name('profesores.reset-password');
 });
 /*
 |--------------------------------------------------------------------------

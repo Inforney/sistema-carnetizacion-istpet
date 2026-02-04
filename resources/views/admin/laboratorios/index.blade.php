@@ -22,110 +22,79 @@
         </div>
     </div>
 
-    {{-- Mensajes --}}
-    @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show">
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    @endif
-
-    @if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show">
-        {{ session('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    @endif
-
-    {{-- Tarjetas de laboratorios --}}
-    <div class="row">
-        @forelse($laboratorios as $lab)
-        <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center" style="background: #1a2342;">
-                    <h5 class="mb-0 text-white">{{ $lab->nombre }}</h5>
-                    <span class="badge bg-{{ $lab->estado === 'activo' ? 'success' : ($lab->estado === 'mantenimiento' ? 'warning' : 'danger') }}">
-                        {{ ucfirst($lab->estado) }}
-                    </span>
-                </div>
-                <div class="card-body">
-                    {{-- QR Code --}}
-                    <div class="text-center mb-3">
-                        {!! QrCode::size(180)->generate($lab->codigo_qr_lab) !!}
-                    </div>
-
-                    {{-- Información --}}
-                    <div class="mb-2">
-                        <small class="text-muted"><i class="bi bi-qr-code me-1"></i>CÓDIGO:</small>
-                        <p class="mb-0 small"><code>{{ $lab->codigo_qr_lab }}</code></p>
-                    </div>
-
-                    <div class="mb-2">
-                        <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>UBICACIÓN:</small>
-                        <p class="mb-0">{{ $lab->ubicacion }}</p>
-                    </div>
-
-                    @if($lab->descripcion)
-                    <div class="mb-2">
-                        <small class="text-muted"><i class="bi bi-info-circle me-1"></i>DESCRIPCIÓN:</small>
-                        <p class="mb-0 small">{{ $lab->descripcion }}</p>
-                    </div>
-                    @endif
-
-                    <div class="row mt-3">
-                        <div class="col-6">
-                            <small class="text-muted">CAPACIDAD:</small>
-                            <p class="mb-0"><strong>{{ $lab->capacidad }}</strong> estudiantes</p>
-                        </div>
-                        <div class="col-6">
-                            <small class="text-muted">OCUPACIÓN:</small>
-                            <p class="mb-0">
-                                <span class="badge bg-{{ $lab->accesos_count > 0 ? 'success' : 'secondary' }}">
-                                    {{ $lab->accesos_count }}/{{ $lab->capacidad }}
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Acciones --}}
-                <div class="card-footer bg-light">
-                    <div class="d-flex justify-content-between gap-2">
-                        <a href="{{ route('admin.laboratorios.generar-qr', $lab->id) }}"
-                            class="btn btn-sm btn-outline-success flex-fill"
-                            title="Descargar QR">
-                            <i class="bi bi-download"></i> QR
-                        </a>
-                        <a href="{{ route('admin.laboratorios.edit', $lab->id) }}"
-                            class="btn btn-sm btn-outline-primary flex-fill"
-                            title="Editar">
-                            <i class="bi bi-pencil"></i> Editar
-                        </a>
-                        <form action="{{ route('admin.laboratorios.destroy', $lab->id) }}"
-                            method="POST"
-                            class="flex-fill"
-                            onsubmit="return confirm('¿Estás seguro de eliminar este laboratorio?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit"
-                                class="btn btn-sm btn-outline-danger w-100"
-                                title="Eliminar">
-                                <i class="bi bi-trash"></i> Eliminar
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        @empty
+    {{-- Filtros por tipo --}}
+    <div class="row mb-3">
         <div class="col-12">
-            <div class="alert alert-info text-center">
-                <i class="bi bi-info-circle me-2"></i>
-                No hay laboratorios registrados.
-                <a href="{{ route('admin.laboratorios.create') }}" class="alert-link">Crear el primero</a>
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="pill" href="#todos">
+                        <i class="bi bi-grid-3x3-gap me-2"></i>Todos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#laboratorios">
+                        <i class="bi bi-cpu me-2"></i>Laboratorios Técnicos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#aulas">
+                        <i class="bi bi-projector me-2"></i>Aulas Interactivas
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    {{-- Contenido por pestañas --}}
+    <div class="tab-content">
+        {{-- Todos --}}
+        <div class="tab-pane fade show active" id="todos">
+            <div class="row">
+                @forelse($laboratorios as $lab)
+                @include('admin.laboratorios.partials.card-laboratorio', ['lab' => $lab])
+                @empty
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-info-circle me-2"></i>
+                        No hay laboratorios o aulas registradas.
+                        <a href="{{ route('admin.laboratorios.create') }}" class="alert-link">Crear el primero</a>
+                    </div>
+                </div>
+                @endforelse
             </div>
         </div>
-        @endforelse
+
+        {{-- Solo Laboratorios --}}
+        <div class="tab-pane fade" id="laboratorios">
+            <div class="row">
+                @forelse($laboratorios->where('tipo', 'laboratorio') as $lab)
+                @include('admin.laboratorios.partials.card-laboratorio', ['lab' => $lab])
+                @empty
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-info-circle me-2"></i>
+                        No hay laboratorios técnicos registrados.
+                    </div>
+                </div>
+                @endforelse
+            </div>
+        </div>
+
+        {{-- Solo Aulas Interactivas --}}
+        <div class="tab-pane fade" id="aulas">
+            <div class="row">
+                @forelse($laboratorios->where('tipo', 'aula_interactiva') as $lab)
+                @include('admin.laboratorios.partials.card-laboratorio', ['lab' => $lab])
+                @empty
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-info-circle me-2"></i>
+                        No hay aulas interactivas registradas.
+                    </div>
+                </div>
+                @endforelse
+            </div>
+        </div>
     </div>
 
     {{-- Paginación --}}

@@ -28,21 +28,6 @@
         </div>
     </div>
 
-    {{-- Mensajes --}}
-    @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show">
-        <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    @endif
-
-    @if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show">
-        <i class="bi bi-exclamation-triangle me-2"></i>{{ session('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    @endif
-
     {{-- Lista de Estudiantes Activos --}}
     <div class="card mb-4">
         <div class="card-header bg-white">
@@ -71,7 +56,7 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     @if($acceso->usuario->foto_url)
-                                    <img src="{{ asset('storage/' . $acceso->usuario->foto_url) }}"
+                                    <img src="{{ asset($acceso->usuario->foto_url) }}"
                                         class="rounded-circle me-2"
                                         style="width: 40px; height: 40px; object-fit: cover;"
                                         alt="Foto">

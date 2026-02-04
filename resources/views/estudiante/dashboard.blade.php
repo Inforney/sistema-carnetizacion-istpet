@@ -6,7 +6,7 @@
 <div class="container py-4">
     {{-- Saludo --}}
     <div class="mb-4">
-        <h2>¡Bienvenido, {{ Auth::user()->nombres }}! 👋</h2>
+        <h2>¡Bienvenido, {{ Auth::user()->nombres }}! </h2>
         <p class="text-muted">Panel de control del estudiante</p>
     </div>
 
@@ -93,6 +93,23 @@
                     </h5>
                 </div>
                 <div class="card-body">
+                    {{-- Foto del estudiante --}}
+                    <div class="text-center mb-3 pb-3 border-bottom">
+                        @if(Auth::user()->foto_url)
+                        <img src="{{ asset(Auth::user()->foto_url) }}"
+                            alt="Mi foto"
+                            class="img-thumbnail rounded-circle"
+                            style="width: 120px; height: 120px; object-fit: cover;">
+                        @else
+                        <div class="d-inline-block img-thumbnail rounded-circle d-flex align-items-center justify-content-center"
+                            style="width: 120px; height: 120px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <span style="font-size: 40px; color: white; font-weight: bold;">
+                                {{ strtoupper(substr(Auth::user()->nombres, 0, 1) . substr(Auth::user()->apellidos, 0, 1)) }}
+                            </span>
+                        </div>
+                        @endif
+                    </div>
+
                     <table class="table table-sm mb-0">
                         <tr>
                             <td class="text-muted" width="40%">Nombre Completo:</td>
@@ -130,7 +147,7 @@
                     <ul class="mb-0">
                         <li class="mb-2">Escanea el QR del laboratorio al <strong>entrar y salir</strong></li>
                         <li class="mb-2">Si no tienes celular, el profesor puede registrarte manualmente</li>
-                        <li class="mb-2">Tu carnet digital es válido por <strong>4 años</strong></li>
+                        <li class="mb-2">Tu carnet digital es válido por <strong>1 año (2 periodos académicos)</strong></li>
                         <li class="mb-2">Mantén tu contraseña segura</li>
                         <li class="mb-0">Revisa tu historial regularmente</li>
                     </ul>
