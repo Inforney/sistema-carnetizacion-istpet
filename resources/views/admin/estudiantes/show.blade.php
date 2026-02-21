@@ -28,6 +28,23 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    {{-- Foto del estudiante --}}
+                    <div class="text-center mb-4 pb-3 border-bottom">
+                        @if($estudiante->foto_url)
+                        <img src="{{ asset($estudiante->foto_url) }}"
+                            alt="Foto de {{ $estudiante->nombreCompleto }}"
+                            class="img-thumbnail rounded-circle"
+                            style="width: 150px; height: 150px; object-fit: cover;">
+                        @else
+                        <div class="d-inline-block img-thumbnail rounded-circle d-flex align-items-center justify-content-center"
+                            style="width: 150px; height: 150px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <span style="font-size: 48px; color: white; font-weight: bold;">
+                                {{ strtoupper(substr($estudiante->nombres, 0, 1) . substr($estudiante->apellidos, 0, 1)) }}
+                            </span>
+                        </div>
+                        @endif
+                    </div>
+
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <h6 class="text-muted small">NOMBRES COMPLETOS</h6>

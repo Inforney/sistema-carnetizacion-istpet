@@ -154,8 +154,8 @@
             </div>
 
             <div class="foto-container">
-                @if($carnet->usuario->foto_url && file_exists(public_path('storage/' . $carnet->usuario->foto_url)))
-                <img src="{{ public_path('storage/' . $carnet->usuario->foto_url) }}" class="foto" alt="Foto">
+                @if($carnet->usuario->foto_url && file_exists(public_path($carnet->usuario->foto_url)))
+                <img src="{{ public_path($carnet->usuario->foto_url) }}" class="foto" alt="Foto">
                 @else
                 <div class="sin-foto"></div>
                 @endif

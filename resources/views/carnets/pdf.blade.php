@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -7,297 +7,212 @@
     <style>
         @page {
             margin: 0;
+            padding: 0;
+            size: 85.6mm 135mm;
         }
 
-        body {
+        * {
             margin: 0;
             padding: 0;
-            font-family: 'Helvetica', 'Arial', sans-serif;
+            box-sizing: border-box;
         }
 
-        .carnet-wrapper {
+        html, body {
+            font-family: 'Arial', sans-serif;
             width: 85.6mm;
-            height: 53.98mm;
-            position: relative;
+            height: 135mm;
+            margin: 0;
+            padding: 0;
             overflow: hidden;
         }
 
-        /* Fondo con gradiente */
-        .background {
-            position: absolute;
+        .carnet {
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #1a2342 0%, #222C57 50%, #2E3B6F 100%);
-        }
-
-        /* Patrón decorativo */
-        .pattern {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            opacity: 0.05;
-            background-image:
-                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 255, 255, .1) 10px, rgba(255, 255, 255, .1) 20px);
-        }
-
-        /* Contenido principal */
-        .carnet-content {
             position: relative;
-            width: 100%;
-            height: 100%;
-            padding: 4mm;
-            color: white;
-            z-index: 1;
+            background: linear-gradient(135deg, #1a2342 0%, #222C57 100%);
+            border-radius: 8px;
+            overflow: hidden;
+            page-break-after: avoid;
+            page-break-inside: avoid;
         }
 
-        /* Header con logo */
         .header {
+            background: #C4A857;
+            padding: 6px;
             text-align: center;
-            padding: 2mm 0;
-            border-bottom: 2px solid #C4A857;
-            margin-bottom: 3mm;
+            color: #1a2342;
         }
 
-        .logo-container {
-            display: inline-block;
-        }
-
-        .logo {
-            font-size: 18pt;
-            line-height: 1;
-            margin-bottom: 1mm;
-        }
-
-        .institucion {
-            font-size: 11pt;
+        .header h1 {
+            font-size: 16px;
             font-weight: bold;
-            color: #C4A857;
-            letter-spacing: 1px;
-            margin-bottom: 0.5mm;
+            margin: 0;
         }
 
-        .subtitulo {
-            font-size: 6pt;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: normal;
+        .header p {
+            font-size: 8px;
+            margin: 2px 0 0 0;
         }
 
-        /* Layout de 2 columnas */
-        .content-layout {
-            display: table;
-            width: 100%;
-            margin-top: 2mm;
+        .foto-container {
+            text-align: center;
+            padding: 10px;
+            background: white;
+            margin: 6px;
+            border-radius: 6px;
         }
 
-        .left-column {
-            display: table-cell;
-            width: 58%;
-            vertical-align: top;
-            padding-right: 2mm;
+        .foto {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #C4A857;
         }
 
-        .right-column {
-            display: table-cell;
-            width: 42%;
-            vertical-align: top;
+        .sin-foto {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #ddd;
+            display: inline-block;
+            border: 2px solid #C4A857;
         }
 
-        /* Cajas de información */
-        .info-card {
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(10px);
-            border-left: 3px solid #C4A857;
-            padding: 2mm;
-            margin-bottom: 2mm;
-            border-radius: 0 2mm 2mm 0;
+        .info {
+            background: white;
+            margin: 0 6px 6px 6px;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .info-row {
+            margin-bottom: 5px;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
         }
 
         .info-label {
-            font-size: 5pt;
+            font-size: 7px;
+            color: #666;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            opacity: 0.8;
-            margin-bottom: 0.5mm;
-            color: #C4A857;
+            font-weight: bold;
         }
 
         .info-value {
-            font-size: 8pt;
+            font-size: 10px;
+            color: #000;
             font-weight: bold;
-            line-height: 1.2;
         }
 
-        /* Código QR */
         .qr-container {
-            background: white;
-            padding: 2.5mm;
-            border-radius: 3mm;
             text-align: center;
-            box-shadow: 0 2mm 4mm rgba(0, 0, 0, 0.3);
+            padding: 6px;
+            background: white;
+            margin: 0 6px 6px 6px;
+            border-radius: 6px;
         }
 
-        .qr-title {
-            font-size: 5pt;
+        .qr-code {
+            width: 65px;
+            height: 65px;
+        }
+
+        .qr-text {
+            font-size: 6px;
             color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 1mm;
+            margin-top: 2px;
         }
 
-        .qr-code-text {
-            font-size: 6pt;
-            font-weight: bold;
-            color: #222C57;
-            word-wrap: break-word;
+        .footer {
+            text-align: center;
+            padding: 6px 6px 4px 6px;
+            color: white;
+            font-size: 7px;
             line-height: 1.3;
-            font-family: 'Courier New', monospace;
         }
 
-        .qr-instruction {
-            font-size: 4pt;
-            color: #999;
-            margin-top: 1mm;
-            font-style: italic;
-        }
-
-        /* Badge de estado */
-        .status-badge {
+        .estado {
             position: absolute;
-            top: 3mm;
-            right: 3mm;
+            top: 8px;
+            right: 8px;
 
             background: {
                     {
-                    $carnet->estado ==='activo' ? '#28A745': '#DC3545'
+                    $carnet->estado ==='activo' ? '#28a745': '#dc3545'
                 }
             }
 
             ;
             color: white;
-            padding: 1mm 3mm;
-            border-radius: 10px;
-            font-size: 6pt;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 8px;
             font-weight: bold;
             text-transform: uppercase;
-            box-shadow: 0 1mm 3mm rgba(0, 0, 0, 0.3);
-            z-index: 10;
-        }
-
-        /* Footer */
-        .footer {
-            position: absolute;
-            bottom: 2.5mm;
-            left: 4mm;
-            right: 4mm;
-            text-align: center;
-            border-top: 1px solid rgba(196, 168, 87, 0.5);
-            padding-top: 1.5mm;
-        }
-
-        .footer-dates {
-            font-size: 5pt;
-            margin-bottom: 1mm;
-        }
-
-        .footer-dates strong {
-            color: #C4A857;
-        }
-
-        .footer-slogan {
-            font-size: 4.5pt;
-            opacity: 0.7;
-            font-style: italic;
-        }
-
-        /* Decoración esquinas */
-        .corner-decoration {
-            position: absolute;
-            width: 8mm;
-            height: 8mm;
-            border: 1px solid rgba(196, 168, 87, 0.3);
-        }
-
-        .corner-tl {
-            top: 2mm;
-            left: 2mm;
-            border-right: none;
-            border-bottom: none;
-        }
-
-        .corner-br {
-            bottom: 2mm;
-            right: 2mm;
-            border-left: none;
-            border-top: none;
         }
     </style>
 </head>
 
 <body>
-    <div class="carnet-wrapper">
-        <!-- Fondo -->
-        <div class="background"></div>
-        <div class="pattern"></div>
+    <div class="carnet">
+        <span class="estado">{{ strtoupper($carnet->estado) }}</span>
 
-        <!-- Decoraciones de esquina -->
-        <div class="corner-decoration corner-tl"></div>
-        <div class="corner-decoration corner-br"></div>
+        <div class="header">
+            <h1>ISTPET</h1>
+            <p>Instituto Superior Tecnológico Mayor Pedro Traversari</p>
+        </div>
 
-        <!-- Badge de estado -->
-        <div class="status-badge">{{ $carnet->estado === 'activo' ? 'ACTIVO' : 'BLOQUEADO' }}</div>
+        <div class="foto-container">
+            @if($usuario->foto_url && file_exists(public_path($usuario->foto_url)))
+            <img src="{{ public_path($usuario->foto_url) }}" class="foto" alt="Foto">
+            @else
+            <div class="sin-foto"></div>
+            @endif
+        </div>
 
-        <!-- Contenido -->
-        <div class="carnet-content">
-            <!-- Header -->
-            <div class="header">
-                <div class="logo-container">
-                    <div class="logo">🎓</div>
-                    <div class="institucion">ISTPET</div>
-                    <div class="subtitulo">Instituto Superior Tecnológico Mayor Pedro Traversari</div>
-                </div>
+        <div class="info">
+            <div class="info-row">
+                <div class="info-label">Estudiante</div>
+                <div class="info-value">{{ $usuario->nombreCompleto }}</div>
             </div>
 
-            <!-- Layout de 2 columnas -->
-            <div class="content-layout">
-                <!-- Columna izquierda: Información -->
-                <div class="left-column">
-                    <div class="info-card">
-                        <div class="info-label">Estudiante</div>
-                        <div class="info-value">{{ strtoupper($usuario->nombres) }}</div>
-                        <div class="info-value">{{ strtoupper($usuario->apellidos) }}</div>
-                    </div>
-
-                    <div class="info-card">
-                        <div class="info-label">Cédula de Identidad</div>
-                        <div class="info-value">{{ $usuario->cedula }}</div>
-                    </div>
-
-                    <div class="info-card">
-                        <div class="info-label">Tipo de Usuario</div>
-                        <div class="info-value">{{ strtoupper($usuario->tipo_usuario) }}</div>
-                    </div>
-                </div>
-
-                <!-- Columna derecha: QR -->
-                <div class="right-column">
-                    <div class="qr-container">
-                        <div class="qr-title">Código de Acceso</div>
-                        <div class="qr-code-text">{{ $carnet->codigo_qr }}</div>
-                        <div class="qr-instruction">Escanear para registro</div>
-                    </div>
-                </div>
+            <div class="info-row">
+                <div class="info-label">Cédula de Identidad</div>
+                <div class="info-value">{{ $usuario->cedula }}</div>
             </div>
 
-            <!-- Footer -->
-            <div class="footer">
-                <div class="footer-dates">
-                    <strong>EMITIDO:</strong> {{ $fechaEmision }} &nbsp;|&nbsp;
-                    <strong>VÁLIDO HASTA:</strong> {{ $fechaVencimiento }}
-                </div>
-                <div class="footer-slogan">
-                    Excelencia Académica - Atrévete a cambiar el mundo
-                </div>
+            <div class="info-row">
+                <div class="info-label">Carrera</div>
+                <div class="info-value">{{ $usuario->carrera ?? 'N/A' }}</div>
             </div>
+
+            <div class="info-row">
+                <div class="info-label">Ciclo/Nivel</div>
+                <div class="info-value">{{ $usuario->ciclo_nivel }}</div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">Correo</div>
+                <div class="info-value" style="font-size: 8px;">{{ $usuario->correo_institucional }}</div>
+            </div>
+        </div>
+
+        <div class="qr-container">
+            <img src="data:image/svg+xml;base64,{{ base64_encode(QrCode::size(130)->generate($carnet->codigo_qr)) }}" class="qr-code">
+            <div class="qr-text">{{ $carnet->codigo_qr }}</div>
+        </div>
+
+        <div class="footer">
+            <p style="margin-bottom: 2px;">
+                Emitido: {{ $fechaEmision }}
+            </p>
+            <p style="margin: 0;">
+                Válido hasta: {{ $fechaVencimiento }}
+            </p>
         </div>
     </div>
 </body>

@@ -106,15 +106,47 @@
                             </a>
                         </div>
                         <div class="col-md-3">
+                            <a href="{{ route('admin.profesores.index') }}" class="btn btn-outline-info w-100 py-3">
+                                <i class="bi bi-person-workspace d-block mb-2" style="font-size: 2rem;"></i>
+                                <strong>Gestionar Profesores</strong>
+                            </a>
+                        </div>
+                        <div class="col-md-3">
                             <a href="{{ route('admin.laboratorios.index') }}" class="btn btn-outline-warning w-100 py-3">
                                 <i class="bi bi-building d-block mb-2" style="font-size: 2rem;"></i>
                                 <strong>Gestionar Laboratorios</strong>
                             </a>
                         </div>
+                    </div>
+
+                    {{-- Segunda fila de acciones --}}
+                    <div class="row g-3 mt-2">
                         <div class="col-md-3">
-                            <a href="{{ route('admin.accesos.estadisticas') }}" class="btn btn-outline-info w-100 py-3">
+                            <a href="{{ route('admin.accesos.estadisticas') }}" class="btn btn-outline-primary w-100 py-3">
                                 <i class="bi bi-graph-up d-block mb-2" style="font-size: 2rem;"></i>
                                 <strong>Ver Estadísticas</strong>
+                                <small class="d-block text-muted mt-1">Reportes y gráficas</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ route('admin.importacion.index') }}" class="btn btn-outline-danger w-100 py-3">
+                                <i class="bi bi-file-earmark-excel d-block mb-2" style="font-size: 2rem;"></i>
+                                <strong>Importación Masiva</strong>
+                                <small class="d-block text-muted mt-1">Subir Excel</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ route('admin.carnets.index') }}" class="btn btn-outline-secondary w-100 py-3">
+                                <i class="bi bi-credit-card-2-front d-block mb-2" style="font-size: 2rem;"></i>
+                                <strong>Ver Carnets</strong>
+                                <small class="d-block text-muted mt-1">Todos los carnets</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ route('admin.solicitudes.index') }}" class="btn btn-outline-secondary w-100 py-3">
+                                <i class="bi bi-envelope-paper d-block mb-2" style="font-size: 2rem;"></i>
+                                <strong>Solicitudes</strong>
+                                <small class="d-block text-muted mt-1">Gestionar solicitudes</small>
                             </a>
                         </div>
                     </div>

@@ -31,7 +31,7 @@
                 {{-- Foto --}}
                 <div class="text-center py-4">
                     @if(Auth::user()->foto_url)
-                    <img src="{{ asset('storage/' . Auth::user()->foto_url) }}"
+                    <img src="{{ asset(Auth::user()->foto_url) }}"
                         class="rounded-circle border border-4 border-warning"
                         style="width: 150px; height: 150px; object-fit: cover;"
                         alt="Foto">

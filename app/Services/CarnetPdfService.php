@@ -38,8 +38,13 @@ class CarnetPdfService
         // Generar PDF
         $pdf = Pdf::loadView('carnets.pdf', $data);
 
-        // Configurar tamaño de carnet (85.6mm x 53.98mm - tamaño ID-1)
-        $pdf->setPaper([0, 0, 242.65, 153], 'portrait');
+        // Configurar tamaño de carnet (85.6mm x 135mm - tamaño vertical)
+        // Dimensiones: 85.6mm = 242.65 points, 135mm = 382.68 points
+        $pdf->setPaper([0, 0, 242.65, 382.68], 'portrait')
+            ->setOption('margin-top', 0)
+            ->setOption('margin-right', 0)
+            ->setOption('margin-bottom', 0)
+            ->setOption('margin-left', 0);
 
         return $pdf;
     }

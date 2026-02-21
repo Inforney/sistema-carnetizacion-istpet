@@ -100,17 +100,16 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
 
     // Gestión de Laboratorios (QR)
     // Gestión de Laboratorios
-Route::get('/laboratorios', [AdminLaboratorioController::class, 'index'])->name('laboratorios.index');
-Route::get('/laboratorios/crear', [AdminLaboratorioController::class, 'create'])->name('laboratorios.create');
-Route::get('/laboratorios/qr/descargar-todos', [AdminLaboratorioController::class, 'descargarTodosQR'])->name('laboratorios.descargar-qr-todos');
-Route::post('/laboratorios', [AdminLaboratorioController::class, 'store'])->name('laboratorios.store');
-Route::get('/laboratorios/{id}', [AdminLaboratorioController::class, 'show'])->name('laboratorios.show');
-Route::get('/laboratorios/{id}/editar', [AdminLaboratorioController::class, 'edit'])->name('laboratorios.edit');
-Route::put('/laboratorios/{id}', [AdminLaboratorioController::class, 'update'])->name('laboratorios.update');
-Route::delete('/laboratorios/{id}', [AdminLaboratorioController::class, 'destroy'])->name('laboratorios.destroy');
-Route::get('/laboratorios/{id}/qr', [AdminLaboratorioController::class, 'generarQR'])->name('laboratorios.generar-qr');
-
-    });
+    Route::get('/laboratorios', [AdminLaboratorioController::class, 'index'])->name('laboratorios.index');
+    Route::get('/laboratorios/crear', [AdminLaboratorioController::class, 'create'])->name('laboratorios.create');
+    Route::get('/laboratorios/qr/descargar-todos', [AdminLaboratorioController::class, 'descargarTodosQR'])->name('laboratorios.descargar-qr-todos');
+    Route::post('/laboratorios', [AdminLaboratorioController::class, 'store'])->name('laboratorios.store');
+    Route::get('/laboratorios/{id}', [AdminLaboratorioController::class, 'show'])->name('laboratorios.show');
+    Route::get('/laboratorios/{id}/editar', [AdminLaboratorioController::class, 'edit'])->name('laboratorios.edit');
+    Route::put('/laboratorios/{id}', [AdminLaboratorioController::class, 'update'])->name('laboratorios.update');
+    Route::delete('/laboratorios/{id}', [AdminLaboratorioController::class, 'destroy'])->name('laboratorios.destroy');
+    Route::get('/laboratorios/{id}/qr', [AdminLaboratorioController::class, 'generarQR'])->name('laboratorios.generar-qr');
+});
 /*
 |--------------------------------------------------------------------------
 | Rutas de Profesor

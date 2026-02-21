@@ -9,10 +9,10 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">
+                <div class="card-header">
+                    <h5 class="mb-0">
                         <i class="bi bi-plus-circle me-2"></i>Generar Nuevo Carnet
-                    </h4>
+                    </h5>
                 </div>
 
                 <div class="card-body">
@@ -52,7 +52,7 @@
                             <ul class="mb-0">
                                 <li>El carnet se generará automáticamente con un código QR único</li>
                                 <li>El código QR tendrá el formato: <code>ISTPET-2026-[CEDULA]</code></li>
-                                <li>El carnet será válido por 4 años (período académico completo)</li>
+                                <li>El carnet será válido por 1 año (2 periodos académicos)</li>
                                 <li>El carnet se creará en estado ACTIVO</li>
                             </ul>
                         </div>

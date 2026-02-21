@@ -13,9 +13,11 @@ class Laboratorio extends Model
 
     protected $fillable = [
         'nombre',
+        'tipo',
         'codigo_qr_lab',
         'ubicacion',
         'capacidad',
+        'descripcion',
         'estado',
     ];
 
@@ -28,7 +30,7 @@ class Laboratorio extends Model
     }
 
     /**
-     * Obtener estudiantes actualmente en el laboratorio (sin salida registrada)
+     * Obtener estudiantes actualmente en el laboratorio
      */
     public function estudiantesActuales()
     {
@@ -56,7 +58,7 @@ class Laboratorio extends Model
     }
 
     /**
-     * Obtener ocupación actual (accessor)
+     * Obtener ocupación actual
      */
     public function getOcupacionActualAttribute()
     {
@@ -65,14 +67,5 @@ class Laboratorio extends Model
             ->where('marcado_ausente', false)
             ->whereDate('fecha_entrada', today())
             ->count();
-    }
-
-    /**
-     * Obtener porcentaje de ocupación
-     */
-    public function getPorcentajeOcupacionAttribute()
-    {
-        if ($this->capacidad == 0) return 0;
-        return round(($this->ocupacion_actual / $this->capacidad) * 100);
     }
 }

@@ -41,24 +41,38 @@ class LaboratorioController extends Controller
     {
         $validated = $request->validate([
             'nombre' => 'required|string|max:100|unique:laboratorios,nombre',
+            'tipo' => 'required|in:laboratorio,aula_interactiva',
             'ubicacion' => 'required|string|max:200',
             'capacidad' => 'required|integer|min:1|max:100',
             'descripcion' => 'nullable|string|max:500',
             'estado' => 'required|in:activo,inactivo,mantenimiento',
         ], [
-            'nombre.required' => 'El nombre del laboratorio es obligatorio',
-            'nombre.unique' => 'Ya existe un laboratorio con este nombre',
+            'nombre.required' => 'El nombre es obligatorio',
+            'nombre.unique' => 'Ya existe con este nombre',
+            'tipo.required' => 'El tipo es obligatorio',
             'ubicacion.required' => 'La ubicación es obligatoria',
             'capacidad.required' => 'La capacidad es obligatoria',
             'capacidad.min' => 'La capacidad debe ser al menos 1',
             'capacidad.max' => 'La capacidad no puede ser mayor a 100',
         ]);
 
-        Laboratorio::create($validated);
+        // Generar código QR único para el laboratorio
+        $codigoQR = 'LAB-' . strtoupper(\Illuminate\Support\Str::slug($validated['nombre'])) . '-' . \Illuminate\Support\Str::random(8);
+
+        // Crear laboratorio con todos los datos
+        Laboratorio::create([
+            'nombre' => $validated['nombre'],
+            'tipo' => $validated['tipo'],
+            'ubicacion' => $validated['ubicacion'],
+            'capacidad' => $validated['capacidad'],
+            'descripcion' => $validated['descripcion'] ?? null,
+            'estado' => $validated['estado'],
+            'codigo_qr_lab' => $codigoQR,
+        ]);
 
         return redirect()
             ->route('admin.laboratorios.index')
-            ->with('success', '✅ Laboratorio creado exitosamente');
+            ->with('success', '✅ ' . ($validated['tipo'] === 'laboratorio' ? 'Laboratorio' : 'Aula Interactiva') . ' creado exitosamente');
     }
 
     /**
@@ -79,13 +93,15 @@ class LaboratorioController extends Controller
 
         $validated = $request->validate([
             'nombre' => 'required|string|max:100|unique:laboratorios,nombre,' . $id,
+            'tipo' => 'required|in:laboratorio,aula_interactiva',
             'ubicacion' => 'required|string|max:200',
             'capacidad' => 'required|integer|min:1|max:100',
             'descripcion' => 'nullable|string|max:500',
             'estado' => 'required|in:activo,inactivo,mantenimiento',
         ], [
-            'nombre.required' => 'El nombre del laboratorio es obligatorio',
-            'nombre.unique' => 'Ya existe un laboratorio con este nombre',
+            'nombre.required' => 'El nombre es obligatorio',
+            'nombre.unique' => 'Ya existe con este nombre',
+            'tipo.required' => 'El tipo es obligatorio',
             'ubicacion.required' => 'La ubicación es obligatoria',
             'capacidad.required' => 'La capacidad es obligatoria',
             'capacidad.min' => 'La capacidad debe ser al menos 1',
@@ -96,7 +112,7 @@ class LaboratorioController extends Controller
 
         return redirect()
             ->route('admin.laboratorios.index')
-            ->with('success', '✅ Laboratorio actualizado exitosamente');
+            ->with('success', '✅ ' . ($validated['tipo'] === 'laboratorio' ? 'Laboratorio' : 'Aula Interactiva') . ' actualizado exitosamente');
     }
 
     /**

@@ -4,18 +4,7 @@
 
 @section('content')
 <div class="container-fluid py-4">
-    {{-- Breadcrumb --}}
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a href="{{ route('admin.dashboard') }}">Dashboard</a>
-            </li>
-            <li class="breadcrumb-item">
-                <a href="{{ route('admin.accesos.index') }}">Accesos</a>
-            </li>
-            <li class="breadcrumb-item active">Estadísticas</li>
-        </ol>
-    </nav>
+
 
     <h2 class="mb-4">
         <i class="bi bi-graph-up me-2"></i>Estadísticas de Accesos

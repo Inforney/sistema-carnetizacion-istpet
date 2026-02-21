@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use App\Helpers\CedulaValidator;
 
 class RegistroController extends Controller
 {
@@ -47,12 +48,33 @@ class RegistroController extends Controller
             'foto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
             'foto_base64' => 'nullable|string',
         ], [
+            'documento.unique' => 'Este número de documento ya está registrado en el sistema.',
+            'correo_institucional.unique' => 'Este correo institucional ya está registrado.',
+            'correo_institucional.email' => 'Debe ingresar un correo electrónico válido.',
+            'celular.digits' => 'El celular debe tener exactamente 10 dígitos.',
             'foto.image' => 'El archivo debe ser una imagen',
             'foto.mimes' => 'Solo se permiten imágenes JPG, JPEG o PNG',
             'foto.max' => 'La foto no debe pesar más de 2MB',
-            'celular.digits' => 'El celular debe tener 10 dígitos',
             'password.regex' => 'La contraseña debe contener mayúsculas, minúsculas, números y caracteres especiales (@$!%*?&#)',
         ]);
+
+        // Validar cédula ecuatoriana si el tipo es cédula
+        if ($validated['tipo_documento'] === 'cedula') {
+            if (!CedulaValidator::validar($validated['documento'])) {
+                return back()
+                    ->withErrors(['documento' => 'El número de cédula ecuatoriana no es válido. Verifique que sea correcto.'])
+                    ->withInput();
+            }
+        }
+
+        // Validar pasaporte (formato básico)
+        if ($validated['tipo_documento'] === 'pasaporte') {
+            if (!preg_match('/^[A-Z0-9]{6,13}$/i', $validated['documento'])) {
+                return back()
+                    ->withErrors(['documento' => 'El formato del pasaporte no es válido.'])
+                    ->withInput();
+            }
+        }
 
         DB::beginTransaction();
 
