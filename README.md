@@ -434,10 +434,6 @@ carnetizacion-istpet/
 
 Este proyecto fue desarrollado como proyecto académico para ISTPET.
 
-=======
->>>>>>> develop
----
-
 ## 🔄 Comandos Artisan Personalizados
 
 ### **Renovación Automática de Carnets**
