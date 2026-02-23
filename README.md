@@ -312,14 +312,13 @@ http://127.0.0.1:8000
 
 ## 👥 Credenciales de Acceso
 ### **Administrador Principal**
- HEAD
 - Usuario: `admin`
 - Contraseña: `IstpetAdmin2026!`
 
 **Perfil de Profesor**
 - Usuario: `1711223344`
 - Contraseña: `Profesor2026!`
-=======
+
 ### **Perfil Estudiante**
 - Cédula: `1726429283`
 - Contraseña: `28112000k`
