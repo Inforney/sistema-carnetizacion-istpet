@@ -12,6 +12,9 @@ use App\Http\Controllers\Admin\LaboratorioController as AdminLaboratorioControll
 use App\Http\Controllers\Admin\LaboratorioController;
 use App\Http\Controllers\Profesor\DashboardController as ProfesorDashboardController;
 use App\Http\Controllers\Profesor\AccesoController as ProfesorAccesoController;
+use App\Http\Controllers\Profesor\ReservaController as ProfesorReservaController;
+use App\Http\Controllers\Profesor\ReporteController as ProfesorReporteController;
+use App\Http\Controllers\Profesor\CambiarPasswordController as ProfesorCambiarPasswordController;
 use App\Http\Controllers\Estudiante\DashboardController as EstudianteDashboardController;
 use App\Http\Controllers\Estudiante\CarnetController as EstudianteCarnetController;
 use App\Http\Controllers\Estudiante\AccesoQRController as EstudianteAccesoQRController;
@@ -66,6 +69,15 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
 
         Route::get('/descargar-plantilla', [App\Http\Controllers\Admin\ImportacionController::class, 'descargarPlantilla'])
             ->name('descargar-plantilla');
+
+        Route::get('/actualizar-niveles', [App\Http\Controllers\Admin\ImportacionController::class, 'actualizarNiveles'])
+            ->name('actualizar-niveles');
+
+        Route::post('/actualizar-niveles', [App\Http\Controllers\Admin\ImportacionController::class, 'procesarActualizacionNiveles'])
+            ->name('actualizar-niveles.procesar');
+
+        Route::get('/descargar-plantilla-niveles', [App\Http\Controllers\Admin\ImportacionController::class, 'descargarPlantillaActualizacion'])
+            ->name('descargar-plantilla-niveles');
     });
 
     // Dashboard
@@ -103,6 +115,7 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::delete('/estudiantes/{id}', [AdminEstudianteController::class, 'destroy'])->name('estudiantes.destroy');
     Route::post('/estudiantes/{id}/toggle-estado', [AdminEstudianteController::class, 'toggleEstado'])->name('estudiantes.toggle');
     Route::post('/estudiantes/{id}/reset-password', [AdminEstudianteController::class, 'resetPassword'])->name('estudiantes.reset-password');
+    Route::post('/estudiantes/{id}/promover-a-profesor', [AdminEstudianteController::class, 'promoverAProfesor'])->name('estudiantes.promover');
 
     // Búsqueda AJAX
     Route::get('/estudiantes-buscar', [AdminEstudianteController::class, 'buscarAjax'])->name('estudiantes.buscar');
@@ -135,7 +148,13 @@ Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
 |--------------------------------------------------------------------------
 */
 
+// Cambiar contraseña (sin password.change para permitir acceso con password temporal)
 Route::prefix('profesor')->name('profesor.')->middleware('profesor')->group(function () {
+    Route::get('/cambiar-password', [ProfesorCambiarPasswordController::class, 'showForm'])->name('cambiar-password.form');
+    Route::post('/cambiar-password', [ProfesorCambiarPasswordController::class, 'cambiar'])->name('cambiar-password.post');
+});
+
+Route::prefix('profesor')->name('profesor.')->middleware(['profesor', 'password.change'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [ProfesorDashboardController::class, 'index'])->name('dashboard');
@@ -158,6 +177,19 @@ Route::prefix('profesor')->name('profesor.')->middleware('profesor')->group(func
 
     // Búsqueda de estudiantes AJAX
     Route::get('/buscar-estudiante', [ProfesorAccesoController::class, 'buscarEstudiante'])->name('accesos.buscar-estudiante');
+
+    // Reservas de laboratorio
+    Route::get('/reservas', [ProfesorReservaController::class, 'index'])->name('reservas.index');
+    Route::get('/reservas/nueva', [ProfesorReservaController::class, 'create'])->name('reservas.create');
+    Route::post('/reservas', [ProfesorReservaController::class, 'store'])->name('reservas.store');
+    Route::post('/reservas/{id}/completar', [ProfesorReservaController::class, 'completar'])->name('reservas.completar');
+    Route::delete('/reservas/{id}', [ProfesorReservaController::class, 'destroy'])->name('reservas.destroy');
+    Route::get('/reservas/disponibilidad', [ProfesorReservaController::class, 'disponibilidad'])->name('reservas.disponibilidad');
+    // IMPORTANTE: ruta con {id} debe ir DESPUÉS de las rutas estáticas
+    Route::get('/reservas/{id}', [ProfesorReservaController::class, 'show'])->name('reservas.show');
+
+    // Reportes (descarga Excel)
+    Route::get('/reportes/descargar', [ProfesorReporteController::class, 'descargar'])->name('reportes.descargar');
 });
 
 /*

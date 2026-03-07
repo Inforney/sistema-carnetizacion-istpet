@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Usuario;
 use App\Models\Carnet;
+use App\Models\Profesor;
 use App\Models\SolicitudPassword;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -57,6 +58,13 @@ class RegistroController extends Controller
             'foto.max' => 'La foto no debe pesar más de 2MB',
             'password.regex' => 'La contraseña debe contener mayúsculas, minúsculas, números y caracteres especiales (@$!%*?&#)',
         ]);
+
+        // Verificar que la cédula no pertenezca ya a un profesor
+        if (Profesor::where('cedula', $validated['documento'])->exists()) {
+            return back()->withInput()->withErrors([
+                'documento' => 'Este número de documento ya está registrado como docente del instituto. Si necesitas acceso, contacta al administrador.',
+            ]);
+        }
 
         // Validar cédula ecuatoriana si el tipo es cédula
         if ($validated['tipo_documento'] === 'cedula') {
@@ -123,7 +131,7 @@ class RegistroController extends Controller
                 'usuario_id' => $usuario->id,
                 'codigo_qr' => $codigoQr,
                 'fecha_emision' => Carbon::now(),
-                'fecha_vencimiento' => Carbon::now()->addYears(4), // 4 años (todo el período académico)
+                'fecha_vencimiento' => Carbon::now()->addMonths(6), // 6 meses (un semestre)
                 'estado' => 'activo',
             ]);
 
@@ -150,9 +158,8 @@ class RegistroController extends Controller
      */
     private function generarCodigoQrUnico($documento)
     {
-        // Formato: ISTPET-2026-DOCUMENTO
-        // Este código será único y permanente para el estudiante
-        return 'ISTPET-2026-' . strtoupper($documento);
+        // Formato: ISTPET-AÑO-DOCUMENTO
+        return 'ISTPET-' . Carbon::now()->year . '-' . strtoupper($documento);
     }
 
     /**

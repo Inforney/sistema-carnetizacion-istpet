@@ -35,16 +35,15 @@ class CarnetPdfService
             'generadoEn' => Carbon::now()->format('d/m/Y H:i'),
         ];
 
-        // Generar PDF
+        // Generar PDF en tamaño A4 con el carnet centrado en la página
         $pdf = Pdf::loadView('carnets.pdf', $data);
 
-        // Configurar tamaño de carnet (85.6mm x 135mm - tamaño vertical)
-        // Dimensiones: 85.6mm = 242.65 points, 135mm = 382.68 points
-        $pdf->setPaper([0, 0, 242.65, 382.68], 'portrait')
+        $pdf->setPaper('a4', 'portrait')
             ->setOption('margin-top', 0)
             ->setOption('margin-right', 0)
             ->setOption('margin-bottom', 0)
-            ->setOption('margin-left', 0);
+            ->setOption('margin-left', 0)
+            ->setOption('dpi', 96);
 
         return $pdf;
     }

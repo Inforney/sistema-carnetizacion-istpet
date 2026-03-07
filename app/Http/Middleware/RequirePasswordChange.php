@@ -13,13 +13,21 @@ class RequirePasswordChange
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Estudiante con contraseña temporal
         if (auth()->check() && auth()->user()->tipo_usuario === 'estudiante') {
-            // Si tiene password temporal (empieza con 'ISTPET')
             if (auth()->user()->password_temporal) {
                 if (!$request->routeIs('estudiante.cambiar-password*')) {
                     return redirect()->route('estudiante.cambiar-password.form')
                         ->with('warning', 'Debes cambiar tu contraseña temporal antes de continuar.');
                 }
+            }
+        }
+
+        // Profesor con contraseña temporal
+        if (auth('profesor')->check() && auth('profesor')->user()->password_temporal) {
+            if (!$request->routeIs('profesor.cambiar-password*')) {
+                return redirect()->route('profesor.cambiar-password.form')
+                    ->with('warning', 'Debes cambiar tu contraseña temporal antes de continuar.');
             }
         }
 

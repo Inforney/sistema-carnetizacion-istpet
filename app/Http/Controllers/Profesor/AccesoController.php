@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Acceso;
 use App\Models\Laboratorio;
+use App\Models\Profesor;
 use App\Models\Usuario;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -126,30 +127,92 @@ class AccesoController extends Controller
     }
 
     /**
-     * Ver historial de accesos
+     * Ver historial de accesos con filtros mejorados
      */
     public function historial(Request $request)
     {
         $query = Acceso::with(['usuario', 'laboratorio', 'profesor']);
 
-        // Filtros
-        if ($request->fecha_desde) {
+        // Filtro por laboratorio
+        if ($request->filled('laboratorio_id')) {
+            $query->where('laboratorio_id', $request->laboratorio_id);
+        }
+
+        // Filtro por profesor
+        if ($request->filled('profesor_id')) {
+            $query->where('profesor_id', $request->profesor_id);
+        }
+
+        // Filtro por fecha desde
+        if ($request->filled('fecha_desde')) {
             $query->whereDate('fecha_entrada', '>=', $request->fecha_desde);
         }
-        if ($request->fecha_hasta) {
+
+        // Filtro por fecha hasta
+        if ($request->filled('fecha_hasta')) {
             $query->whereDate('fecha_entrada', '<=', $request->fecha_hasta);
         }
-        if ($request->laboratorio_id) {
-            $query->where('laboratorio_id', $request->laboratorio_id);
+
+        // Filtro por tipo de problema
+        if ($request->filled('tipo_problema')) {
+            switch ($request->tipo_problema) {
+                case 'ausente':
+                    $query->where('marcado_ausente', true);
+                    break;
+                case 'salida_temprana':
+                    // Salida registrada en menos de 30 minutos
+                    $query->whereNotNull('hora_salida')
+                          ->where('marcado_ausente', false)
+                          ->whereRaw('TIMESTAMPDIFF(MINUTE, hora_entrada, hora_salida) < 30');
+                    break;
+                case 'sin_salida':
+                    // Entradas sin salida de días anteriores (hoy se excluyen)
+                    $query->whereNull('hora_salida')
+                          ->where('marcado_ausente', false)
+                          ->whereDate('fecha_entrada', '<', today());
+                    break;
+                case 'todos_problemas':
+                    $query->where(function ($q) {
+                        $q->where('marcado_ausente', true)
+                          ->orWhere(function ($q2) {
+                              $q2->whereNotNull('hora_salida')
+                                 ->whereRaw('TIMESTAMPDIFF(MINUTE, hora_entrada, hora_salida) < 30');
+                          })
+                          ->orWhere(function ($q3) {
+                              $q3->whereNull('hora_salida')
+                                 ->where('marcado_ausente', false)
+                                 ->whereDate('fecha_entrada', '<', today());
+                          });
+                    });
+                    break;
+            }
         }
 
         $accesos = $query->orderBy('fecha_entrada', 'desc')
             ->orderBy('hora_entrada', 'desc')
-            ->paginate(20);
+            ->paginate(25)
+            ->withQueryString();
 
-        $laboratorios = Laboratorio::where('estado', 'activo')->get();
+        $laboratorios = Laboratorio::where('estado', 'activo')->orderBy('nombre')->get();
+        $profesores   = Profesor::where('estado', 'activo')->orderBy('apellidos')->get();
 
-        return view('profesor.accesos.historial', compact('accesos', 'laboratorios'));
+        // Estadísticas del resultado filtrado (sin paginar)
+        $stats = [
+            'total'         => $accesos->total(),
+            'ausentes'      => Acceso::when($request->filled('laboratorio_id'), fn($q) => $q->where('laboratorio_id', $request->laboratorio_id))
+                                     ->when($request->filled('profesor_id'), fn($q) => $q->where('profesor_id', $request->profesor_id))
+                                     ->when($request->filled('fecha_desde'), fn($q) => $q->whereDate('fecha_entrada', '>=', $request->fecha_desde))
+                                     ->when($request->filled('fecha_hasta'), fn($q) => $q->whereDate('fecha_entrada', '<=', $request->fecha_hasta))
+                                     ->where('marcado_ausente', true)->count(),
+            'sin_salida'    => Acceso::when($request->filled('laboratorio_id'), fn($q) => $q->where('laboratorio_id', $request->laboratorio_id))
+                                     ->when($request->filled('profesor_id'), fn($q) => $q->where('profesor_id', $request->profesor_id))
+                                     ->when($request->filled('fecha_desde'), fn($q) => $q->whereDate('fecha_entrada', '>=', $request->fecha_desde))
+                                     ->when($request->filled('fecha_hasta'), fn($q) => $q->whereDate('fecha_entrada', '<=', $request->fecha_hasta))
+                                     ->whereNull('hora_salida')->where('marcado_ausente', false)
+                                     ->whereDate('fecha_entrada', '<', today())->count(),
+        ];
+
+        return view('profesor.accesos.historial', compact('accesos', 'laboratorios', 'profesores', 'stats'));
     }
 
     /**

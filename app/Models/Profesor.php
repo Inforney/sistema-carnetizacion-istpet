@@ -30,6 +30,7 @@ class Profesor extends Authenticatable
         'departamento',
         'estado',
         'password',
+        'password_temporal',
     ];
 
     /**
@@ -50,6 +51,7 @@ class Profesor extends Authenticatable
     {
         return [
             'password' => 'hashed',
+            'password_temporal' => 'boolean',
         ];
     }
 

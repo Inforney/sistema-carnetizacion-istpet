@@ -10,7 +10,7 @@
             <h2><i class="bi bi-file-earmark-excel me-2"></i>Importación Masiva desde Excel</h2>
             <p class="text-muted mb-0">Importa múltiples estudiantes desde un archivo Excel</p>
         </div>
-        <div>
+        <div class="d-flex gap-2 flex-wrap">
             <a href="{{ route('admin.importacion.descargar-plantilla') }}" class="btn btn-success">
                 <i class="bi bi-download me-2"></i>Descargar Plantilla Excel
             </a>
@@ -18,6 +18,24 @@
                 <i class="bi bi-arrow-left me-2"></i>Volver a Estudiantes
             </a>
         </div>
+    </div>
+
+    {{-- Acceso a actualización de niveles --}}
+    <div class="alert d-flex align-items-center gap-3 mb-4"
+         style="background:rgba(196,168,87,0.1);border:1.5px solid rgba(196,168,87,0.5);border-radius:10px;padding:14px 20px;">
+        <i class="bi bi-arrow-up-circle" style="font-size:1.8rem;color:var(--istpet-dorado);flex-shrink:0;"></i>
+        <div class="flex-grow-1">
+            <strong style="color:var(--istpet-azul);">¿Inicio de período académico?</strong>
+            <span class="d-block" style="font-size:0.86rem;color:#555;margin-top:2px;">
+                Usa la <strong>Actualización Masiva de Niveles</strong> para subir de ciclo a todos los estudiantes en un solo archivo Excel.
+                No crea nuevos registros, solo actualiza los existentes.
+            </span>
+        </div>
+        <a href="{{ route('admin.importacion.actualizar-niveles') }}"
+           class="btn btn-sm flex-shrink-0 fw-bold"
+           style="background:var(--istpet-dorado);color:var(--istpet-azul);white-space:nowrap;">
+            <i class="bi bi-arrow-up-circle me-1"></i>Actualizar Niveles
+        </a>
     </div>
 
     {{-- Instrucciones --}}

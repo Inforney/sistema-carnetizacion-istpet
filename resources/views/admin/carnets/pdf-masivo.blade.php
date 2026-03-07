@@ -1,223 +1,121 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <title>Carnets ISTPET - Descarga Masiva</title>
     <style>
-        * {
+        @page {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            size: A4 portrait;
         }
-
-        body {
-            font-family: 'Arial', sans-serif;
-        }
-
-        .page-break {
-            page-break-after: always;
-        }
-
-        .carnet-container {
-            width: 85.6mm;
-            height: 135mm;
-            margin: 10mm auto;
-        }
-
-        .carnet {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            background: linear-gradient(135deg, #1a2342 0%, #222C57 100%);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .header {
-            background: #C4A857;
-            padding: 10px;
-            text-align: center;
-            color: #1a2342;
-        }
-
-        .header h1 {
-            font-size: 18px;
-            font-weight: bold;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            font-family: Arial, Helvetica, sans-serif;
+            width: 210mm;
             margin: 0;
+            padding: 0;
+            background: #fff;
         }
-
-        .header p {
-            font-size: 9px;
-            margin: 2px 0 0 0;
+        .page-break { page-break-after: always; }
+        /* Grid A4: 2 carnets (85.6mm) × 2 filas (135mm) con márgenes y gaps */
+        .page-wrap {
+            width: 210mm;
+            height: 297mm;
+            background: #eef0f5;
+            position: relative;
         }
-
-        .foto-container {
-            text-align: center;
-            padding: 15px;
-            background: white;
-            margin: 10px;
-            border-radius: 8px;
-        }
-
-        .foto {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #C4A857;
-        }
-
-        .sin-foto {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: #ddd;
-            display: inline-block;
-            border: 3px solid #C4A857;
-        }
-
-        .info {
-            background: white;
-            margin: 0 10px 10px 10px;
-            padding: 15px;
-            border-radius: 8px;
-        }
-
-        .info-row {
-            margin-bottom: 8px;
-        }
-
-        .info-label {
-            font-size: 8px;
-            color: #666;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-
-        .info-value {
-            font-size: 11px;
-            color: #000;
-            font-weight: bold;
-        }
-
-        .qr-container {
-            text-align: center;
-            padding: 10px;
-            background: white;
-            margin: 0 10px 10px 10px;
-            border-radius: 8px;
-        }
-
-        .qr-code {
-            width: 80px;
-            height: 80px;
-        }
-
-        .qr-text {
-            font-size: 7px;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 10px;
-            color: white;
-            font-size: 8px;
-        }
-
-        .estado {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #28a745;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 9px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
+        /* Cada página tiene: encabezado 12mm + 2 filas + gaps + pie */
     </style>
 </head>
-
 <body>
-    @foreach($carnets as $index => $carnet)
-    <div class="carnet-container">
-        <div class="carnet">
-            <span class="estado">ACTIVO</span>
 
-            <div class="header">
-                <h1>ISTPET</h1>
-                <p>Instituto Superior Tecnológico Mayor Pedro Traversari</p>
-            </div>
+@php
+    $totalCarnets = count($carnets);
+    $porPagina = 4; // 2 columnas × 2 filas
+    $paginas = ceil($totalCarnets / $porPagina);
+@endphp
 
-            <div class="foto-container">
-                @if($carnet->usuario->foto_url && file_exists(public_path($carnet->usuario->foto_url)))
-                <img src="{{ public_path($carnet->usuario->foto_url) }}" class="foto" alt="Foto">
-                @else
-                <div class="sin-foto"></div>
-                @endif
-            </div>
+@for($p = 0; $p < $paginas; $p++)
+@php
+    $inicio = $p * $porPagina;
+    $fin = min($inicio + $porPagina, $totalCarnets);
+    $grupoActual = $carnets->slice($inicio, $porPagina)->values();
+@endphp
 
-            <div class="info">
-                <div class="info-row">
-                    <div class="info-label">Estudiante</div>
-                    <div class="info-value">{{ $carnet->usuario->nombreCompleto }}</div>
-                </div>
+<table width="100%" style="width:210mm;height:297mm;border-collapse:collapse;table-layout:fixed;background:#eef0f5;" cellpadding="0" cellspacing="0">
 
-                <div class="info-row">
-                    <div class="info-label">Cédula</div>
-                    <div class="info-value">{{ $carnet->usuario->cedula }}</div>
-                </div>
+    {{-- ══ ENCABEZADO (14mm) ══ --}}
+    <tr>
+        <td colspan="2" style="height:14mm;background:#222C57;padding:0;vertical-align:middle;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="padding:3mm 10mm;">
+                <tr>
+                    <td style="vertical-align:middle;">
+                        <div style="width:22px;height:22px;background:#fff;border-radius:4px;display:inline-block;text-align:center;padding:2px;vertical-align:middle;margin-right:7px;">
+                            <img src="{{ public_path('images/LogoISTPET.png') }}" width="18" height="18" style="display:block;object-fit:contain;">
+                        </div>
+                        <span style="color:#C4A857;font-size:14px;font-weight:bold;letter-spacing:2px;vertical-align:middle;">ISTPET</span>
+                        <span style="color:rgba(255,255,255,0.6);font-size:7px;vertical-align:middle;margin-left:8px;">Instituto Superior Tecnológico Público Mayor Pedro Traversari · Sistema de Carnetización</span>
+                    </td>
+                    <td style="vertical-align:middle;text-align:right;">
+                        <span style="color:rgba(196,168,87,0.7);font-size:7px;">Pág. {{ $p + 1 }} / {{ $paginas }} · {{ now()->format('d/m/Y') }}</span>
+                    </td>
+                </tr>
+            </table>
+            <div style="height:2px;background:#C4A857;"></div>
+        </td>
+    </tr>
 
-                <div class="info-row">
-                    <div class="info-label">Carrera</div>
-                    <div class="info-value">{{ $carnet->usuario->carrera ?? 'N/A' }}</div>
-                </div>
+    {{-- ══ FILA 1 de carnets (139mm) ══ --}}
+    <tr>
+        {{-- Carnet 1 --}}
+        <td style="height:139mm;width:105mm;vertical-align:middle;text-align:center;padding:4mm 5mm 2mm 10mm;">
+            @if(isset($grupoActual[0]))
+            @php $c = $grupoActual[0]; @endphp
+            @include('admin.carnets._carnet-mini', ['carnet' => $c])
+            @endif
+        </td>
+        {{-- Carnet 2 --}}
+        <td style="height:139mm;width:105mm;vertical-align:middle;text-align:center;padding:4mm 10mm 2mm 5mm;">
+            @if(isset($grupoActual[1]))
+            @php $c = $grupoActual[1]; @endphp
+            @include('admin.carnets._carnet-mini', ['carnet' => $c])
+            @endif
+        </td>
+    </tr>
 
-                <div class="info-row">
-                    <div class="info-label">Ciclo</div>
-                    <div class="info-value">{{ $carnet->usuario->ciclo_nivel }}</div>
-                </div>
-            </div>
+    {{-- ══ FILA 2 de carnets (139mm) ══ --}}
+    <tr>
+        {{-- Carnet 3 --}}
+        <td style="height:139mm;width:105mm;vertical-align:middle;text-align:center;padding:2mm 5mm 4mm 10mm;">
+            @if(isset($grupoActual[2]))
+            @php $c = $grupoActual[2]; @endphp
+            @include('admin.carnets._carnet-mini', ['carnet' => $c])
+            @endif
+        </td>
+        {{-- Carnet 4 --}}
+        <td style="height:139mm;width:105mm;vertical-align:middle;text-align:center;padding:2mm 10mm 4mm 5mm;">
+            @if(isset($grupoActual[3]))
+            @php $c = $grupoActual[3]; @endphp
+            @include('admin.carnets._carnet-mini', ['carnet' => $c])
+            @endif
+        </td>
+    </tr>
 
-            <div class="qr-container">
-                <img src="data:image/svg+xml;base64,{{ base64_encode(QrCode::size(200)->generate($carnet->codigo_qr)) }}" class="qr-code">
-                <div class="qr-text">{{ $carnet->codigo_qr }}</div>
-            </div>
+    {{-- ══ PIE DE PÁGINA (5mm) ══ --}}
+    <tr>
+        <td colspan="2" style="height:5mm;background:#222C57;padding:0;vertical-align:middle;text-align:center;">
+            <span style="color:rgba(196,168,87,0.5);font-size:6px;font-style:italic;">✂ Recortar por las líneas punteadas · Excelencia Académica · ISTPET {{ now()->year }}</span>
+        </td>
+    </tr>
 
-            <div class="footer">
-                <p>
-                    Emitido:
-                    @if(is_object($carnet->fecha_emision))
-                    {{ $carnet->fecha_emision->format('d/m/Y') }}
-                    @else
-                    {{ date('d/m/Y', strtotime($carnet->fecha_emision)) }}
-                    @endif
-                </p>
-                <p>
-                    Válido hasta:
-                    @if($carnet->fecha_vencimiento)
-                    @if(is_object($carnet->fecha_vencimiento))
-                    {{ $carnet->fecha_vencimiento->format('d/m/Y') }}
-                    @else
-                    {{ date('d/m/Y', strtotime($carnet->fecha_vencimiento)) }}
-                    @endif
-                    @else
-                    N/A
-                    @endif
-                </p>
-            </div>
-        </div>
-    </div>
+</table>
 
-    @if($index < count($carnets) - 1)
-        <div class="page-break">
-        </div>
-        @endif
-        @endforeach
+@if($p < $paginas - 1)
+<div class="page-break"></div>
+@endif
+
+@endfor
+
 </body>
-
 </html>

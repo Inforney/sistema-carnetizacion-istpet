@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Profesor;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -12,11 +13,34 @@ use Illuminate\Validation\Rule;
 class ProfesorController extends Controller
 {
     /**
-     * Mostrar lista de profesores
+     * Mostrar lista de profesores con filtros de búsqueda
      */
-    public function index()
+    public function index(Request $request)
     {
-        $profesores = Profesor::orderBy('created_at', 'desc')->paginate(15);
+        $query = Profesor::orderBy('created_at', 'desc');
+
+        // Búsqueda por nombre o cédula
+        if ($request->filled('buscar')) {
+            $termino = $request->buscar;
+            $query->where(function ($q) use ($termino) {
+                $q->where('nombres', 'like', "%{$termino}%")
+                    ->orWhere('apellidos', 'like', "%{$termino}%")
+                    ->orWhere('cedula', 'like', "%{$termino}%")
+                    ->orWhere('correo', 'like', "%{$termino}%");
+            });
+        }
+
+        // Filtro por estado
+        if ($request->filled('estado')) {
+            $query->where('estado', $request->estado);
+        }
+
+        // Filtro por departamento
+        if ($request->filled('departamento')) {
+            $query->where('departamento', $request->departamento);
+        }
+
+        $profesores = $query->paginate(15)->withQueryString();
 
         $stats = [
             'total' => Profesor::count(),
@@ -24,7 +48,13 @@ class ProfesorController extends Controller
             'inactivos' => Profesor::where('estado', 'inactivo')->count(),
         ];
 
-        return view('admin.profesores.index', compact('profesores', 'stats'));
+        // Obtener lista de departamentos únicos para el filtro
+        $departamentos = Profesor::whereNotNull('departamento')
+            ->distinct()
+            ->orderBy('departamento')
+            ->pluck('departamento');
+
+        return view('admin.profesores.index', compact('profesores', 'stats', 'departamentos'));
     }
 
     /**
@@ -55,15 +85,21 @@ class ProfesorController extends Controller
             'foto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ]);
 
-        // Procesar foto si existe
+        // Nunca permitir que la misma cédula exista como estudiante Y como profesor
+        $estudianteExistente = Usuario::where('cedula', $validated['cedula'])->first();
+        if ($estudianteExistente) {
+            return back()->withInput()->withErrors([
+                'cedula' => 'Esta cédula ya pertenece al estudiante "' . $estudianteExistente->nombres . ' ' . $estudianteExistente->apellidos . '". Para convertirlo en profesor, usa el botón "Promover a Profesor" en su perfil de estudiante.',
+            ]);
+        }
+
         if ($request->hasFile('foto')) {
             $foto = $request->file('foto');
             $nombreFoto = 'profesor_' . $validated['cedula'] . '.' . $foto->getClientOriginalExtension();
-            $rutaFoto = $foto->storeAs('public/fotos/profesores', $nombreFoto);
+            $foto->storeAs('fotos/profesores', $nombreFoto, 'public');
             $validated['foto_url'] = 'storage/fotos/profesores/' . $nombreFoto;
         }
 
-        // Encriptar password
         $validated['password'] = Hash::make($validated['password']);
 
         Profesor::create($validated);
@@ -78,8 +114,6 @@ class ProfesorController extends Controller
     public function show($id)
     {
         $profesor = Profesor::findOrFail($id);
-
-        // Contar accesos validados por este profesor
         $accesosValidados = $profesor->accesos()->count();
 
         return view('admin.profesores.show', compact('profesor', 'accesosValidados'));
@@ -120,20 +154,18 @@ class ProfesorController extends Controller
             'foto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ]);
 
-        // Procesar foto si existe
         if ($request->hasFile('foto')) {
-            // Eliminar foto anterior si existe
-            if ($profesor->foto_url && file_exists(public_path($profesor->foto_url))) {
-                unlink(public_path($profesor->foto_url));
+            if ($profesor->foto_url) {
+                $rutaAnterior = str_replace('storage/', '', $profesor->foto_url);
+                Storage::disk('public')->delete($rutaAnterior);
             }
 
             $foto = $request->file('foto');
             $nombreFoto = 'profesor_' . $profesor->cedula . '.' . $foto->getClientOriginalExtension();
-            $rutaFoto = $foto->storeAs('public/fotos/profesores', $nombreFoto);
+            $foto->storeAs('fotos/profesores', $nombreFoto, 'public');
             $validated['foto_url'] = 'storage/fotos/profesores/' . $nombreFoto;
         }
 
-        // Solo actualizar password si se proporcionó uno nuevo
         if (!empty($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
         } else {
@@ -169,8 +201,6 @@ class ProfesorController extends Controller
     public function destroy($id)
     {
         $profesor = Profesor::findOrFail($id);
-
-        // Cambiar estado a inactivo en lugar de eliminar
         $profesor->update(['estado' => 'inactivo']);
 
         return redirect()->route('admin.profesores.index')
@@ -178,16 +208,32 @@ class ProfesorController extends Controller
     }
 
     /**
-     * Resetear contraseña
+     * Resetear contraseña del profesor y generar enlace WhatsApp
      */
     public function resetPassword($id)
     {
         $profesor = Profesor::findOrFail($id);
 
-        // Generar contraseña temporal (cédula)
-        $nuevaPassword = $profesor->cedula;
-        $profesor->update(['password' => Hash::make($nuevaPassword)]);
+        // Formato: ISTPET + últimos 4 dígitos de cédula
+        $nuevaPassword = 'ISTPET' . substr($profesor->cedula, -4);
+        $profesor->update([
+            'password'          => Hash::make($nuevaPassword),
+            'password_temporal' => true,
+        ]);
 
-        return back()->with('success', 'Contraseña reseteada exitosamente. Nueva contraseña: ' . $nuevaPassword);
+        // Generar enlace WhatsApp con el mensaje pre-escrito
+        $telefono = $profesor->celular;
+        $telefonoIntl = '593' . ltrim($telefono, '0'); // Ecuador: 593 + número sin 0
+        $mensaje = "Hola {$profesor->nombreCompleto}, el administrador del Sistema ISTPET ha restablecido tu contraseña.\n\nNueva contraseña temporal: *{$nuevaPassword}*\n\nIngresa al sistema con tu cédula y esta contraseña.\n" . config('app.url');
+        $waLink = 'https://wa.me/' . $telefonoIntl . '?text=' . urlencode($mensaje);
+
+        return back()
+            ->with('success', "Contraseña reseteada para {$profesor->nombreCompleto}. Contraseña temporal: {$nuevaPassword}")
+            ->with('whatsapp', [
+                'nombre' => $profesor->nombreCompleto,
+                'telefono' => $telefono,
+                'password' => $nuevaPassword,
+                'link' => $waLink,
+            ]);
     }
 }

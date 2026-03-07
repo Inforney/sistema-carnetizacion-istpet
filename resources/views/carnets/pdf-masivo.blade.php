@@ -1,277 +1,109 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Carnets ISTPET - Impresión Masiva</title>
     <style>
         @page {
-            margin: 5mm;
-            size: letter portrait;
-        }
-
-        body {
             margin: 0;
             padding: 0;
-            font-family: 'Helvetica', 'Arial', sans-serif;
+            size: A4 portrait;
         }
-
-        .page-container {
-            width: 100%;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            font-family: Arial, Helvetica, sans-serif;
+            width: 210mm;
+            margin: 0;
+            padding: 0;
+            background: #fff;
         }
-
-        .carnet-row {
-            display: table;
-            width: 100%;
-            margin-bottom: 5mm;
-        }
-
-        .carnet-cell {
-            display: table-cell;
-            width: 50%;
-            padding: 2mm;
-        }
-
-        .carnet-wrapper {
-            width: 85.6mm;
-            height: 53.98mm;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .background {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #1a2342 0%, #222C57 50%, #2E3B6F 100%);
-        }
-
-        .pattern {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            opacity: 0.05;
-            background-image:
-                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 255, 255, .1) 10px, rgba(255, 255, 255, .1) 20px);
-        }
-
-        .carnet-content {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            padding: 4mm;
-            color: white;
-            z-index: 1;
-        }
-
-        .header {
-            text-align: center;
-            padding: 2mm 0;
-            border-bottom: 2px solid #C4A857;
-            margin-bottom: 3mm;
-        }
-
-        .logo {
-            font-size: 18pt;
-            line-height: 1;
-            margin-bottom: 1mm;
-        }
-
-        .institucion {
-            font-size: 11pt;
-            font-weight: bold;
-            color: #C4A857;
-            letter-spacing: 1px;
-            margin-bottom: 0.5mm;
-        }
-
-        .subtitulo {
-            font-size: 6pt;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .content-layout {
-            display: table;
-            width: 100%;
-            margin-top: 2mm;
-        }
-
-        .left-column {
-            display: table-cell;
-            width: 58%;
-            vertical-align: top;
-            padding-right: 2mm;
-        }
-
-        .right-column {
-            display: table-cell;
-            width: 42%;
-            vertical-align: top;
-        }
-
-        .info-card {
-            background: rgba(255, 255, 255, 0.12);
-            border-left: 3px solid #C4A857;
-            padding: 2mm;
-            margin-bottom: 2mm;
-            border-radius: 0 2mm 2mm 0;
-        }
-
-        .info-label {
-            font-size: 5pt;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            opacity: 0.8;
-            margin-bottom: 0.5mm;
-            color: #C4A857;
-        }
-
-        .info-value {
-            font-size: 8pt;
-            font-weight: bold;
-            line-height: 1.2;
-        }
-
-        .qr-container {
-            background: white;
-            padding: 2.5mm;
-            border-radius: 3mm;
-            text-align: center;
-            box-shadow: 0 2mm 4mm rgba(0, 0, 0, 0.3);
-        }
-
-        .qr-title {
-            font-size: 5pt;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 1mm;
-        }
-
-        .qr-code-text {
-            font-size: 6pt;
-            font-weight: bold;
-            color: #222C57;
-            word-wrap: break-word;
-            line-height: 1.3;
-            font-family: 'Courier New', monospace;
-        }
-
-        .status-badge {
-            position: absolute;
-            top: 3mm;
-            right: 3mm;
-            background: #28A745;
-            color: white;
-            padding: 1mm 3mm;
-            border-radius: 10px;
-            font-size: 6pt;
-            font-weight: bold;
-            text-transform: uppercase;
-            box-shadow: 0 1mm 3mm rgba(0, 0, 0, 0.3);
-            z-index: 10;
-        }
-
-        .footer {
-            position: absolute;
-            bottom: 2.5mm;
-            left: 4mm;
-            right: 4mm;
-            text-align: center;
-            border-top: 1px solid rgba(196, 168, 87, 0.5);
-            padding-top: 1.5mm;
-        }
-
-        .footer-dates {
-            font-size: 5pt;
-            margin-bottom: 1mm;
-        }
-
-        .footer-dates strong {
-            color: #C4A857;
-        }
-
-        .footer-slogan {
-            font-size: 4.5pt;
-            opacity: 0.7;
-            font-style: italic;
-        }
-
-        .page-break {
-            page-break-after: always;
-        }
+        .page-break { page-break-after: always; }
     </style>
 </head>
-
 <body>
-    <div class="page-container">
-        @foreach($carnetes as $index => $item)
-        @if($index % 2 == 0)
-        <div class="carnet-row">
+
+@php
+    $lista = collect($carnetes);
+    $total = $lista->count();
+    $porPagina = 4;
+    $paginas = ceil($total / $porPagina);
+@endphp
+
+@for($p = 0; $p < $paginas; $p++)
+@php
+    $inicio = $p * $porPagina;
+    $grupo = $lista->slice($inicio, $porPagina)->values();
+@endphp
+
+<table width="100%" style="width:210mm;height:297mm;border-collapse:collapse;table-layout:fixed;background:#eef0f5;" cellpadding="0" cellspacing="0">
+
+    {{-- ══ ENCABEZADO (14mm) ══ --}}
+    <tr>
+        <td colspan="2" style="height:14mm;background:#222C57;padding:0;vertical-align:middle;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="padding:3mm 10mm;">
+                <tr>
+                    <td style="vertical-align:middle;">
+                        <div style="width:22px;height:22px;background:#fff;border-radius:4px;display:inline-block;text-align:center;padding:2px;vertical-align:middle;margin-right:7px;">
+                            <img src="{{ public_path('images/LogoISTPET.png') }}" width="18" height="18" style="display:block;object-fit:contain;">
+                        </div>
+                        <span style="color:#C4A857;font-size:14px;font-weight:bold;letter-spacing:2px;vertical-align:middle;">ISTPET</span>
+                        <span style="color:rgba(255,255,255,0.6);font-size:7px;vertical-align:middle;margin-left:8px;">Instituto Superior Tecnológico Público Mayor Pedro Traversari · Sistema de Carnetización</span>
+                    </td>
+                    <td style="vertical-align:middle;text-align:right;">
+                        <span style="color:rgba(196,168,87,0.7);font-size:7px;">Pág. {{ $p + 1 }} / {{ $paginas }} · {{ now()->format('d/m/Y') }}</span>
+                    </td>
+                </tr>
+            </table>
+            <div style="height:2px;background:#C4A857;"></div>
+        </td>
+    </tr>
+
+    {{-- ══ FILA 1 (139mm) ══ --}}
+    <tr>
+        <td style="height:139mm;width:105mm;vertical-align:middle;text-align:center;padding:4mm 5mm 2mm 10mm;">
+            @if(isset($grupo[0]))
+            @php $item = $grupo[0]; @endphp
+            @include('carnets._carnet-mini-item', ['item' => $item])
             @endif
+        </td>
+        <td style="height:139mm;width:105mm;vertical-align:middle;text-align:center;padding:4mm 10mm 2mm 5mm;">
+            @if(isset($grupo[1]))
+            @php $item = $grupo[1]; @endphp
+            @include('carnets._carnet-mini-item', ['item' => $item])
+            @endif
+        </td>
+    </tr>
 
-            <div class="carnet-cell">
-                <div class="carnet-wrapper">
-                    <div class="background"></div>
-                    <div class="pattern"></div>
+    {{-- ══ FILA 2 (139mm) ══ --}}
+    <tr>
+        <td style="height:139mm;width:105mm;vertical-align:middle;text-align:center;padding:2mm 5mm 4mm 10mm;">
+            @if(isset($grupo[2]))
+            @php $item = $grupo[2]; @endphp
+            @include('carnets._carnet-mini-item', ['item' => $item])
+            @endif
+        </td>
+        <td style="height:139mm;width:105mm;vertical-align:middle;text-align:center;padding:2mm 10mm 4mm 5mm;">
+            @if(isset($grupo[3]))
+            @php $item = $grupo[3]; @endphp
+            @include('carnets._carnet-mini-item', ['item' => $item])
+            @endif
+        </td>
+    </tr>
 
-                    <div class="status-badge">{{ $item['carnet']->estado === 'activo' ? 'ACTIVO' : 'BLOQUEADO' }}</div>
+    {{-- ══ PIE (5mm) ══ --}}
+    <tr>
+        <td colspan="2" style="height:5mm;background:#222C57;padding:0;vertical-align:middle;text-align:center;">
+            <span style="color:rgba(196,168,87,0.5);font-size:6px;font-style:italic;">✂ Recortar por las líneas punteadas · Excelencia Académica · ISTPET {{ now()->year }}</span>
+        </td>
+    </tr>
 
-                    <div class="carnet-content">
-                        <div class="header">
-                            <div class="logo">🎓</div>
-                            <div class="institucion">ISTPET</div>
-                            <div class="subtitulo">Instituto Superior Tecnológico Mayor Pedro Traversari</div>
-                        </div>
+</table>
 
-                        <div class="content-layout">
-                            <div class="left-column">
-                                <div class="info-card">
-                                    <div class="info-label">Estudiante</div>
-                                    <div class="info-value">{{ strtoupper($item['usuario']->nombres) }}</div>
-                                    <div class="info-value">{{ strtoupper($item['usuario']->apellidos) }}</div>
-                                </div>
+@if($p < $paginas - 1)
+<div class="page-break"></div>
+@endif
 
-                                <div class="info-card">
-                                    <div class="info-label">Cédula</div>
-                                    <div class="info-value">{{ $item['usuario']->cedula }}</div>
-                                </div>
+@endfor
 
-                                <div class="info-card">
-                                    <div class="info-label">Tipo</div>
-                                    <div class="info-value">{{ strtoupper($item['usuario']->tipo_usuario) }}</div>
-                                </div>
-                            </div>
-
-                            <div class="right-column">
-                                <div class="qr-container">
-                                    <div class="qr-title">Código de Acceso</div>
-                                    <div class="qr-code-text">{{ $item['carnet']->codigo_qr }}</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="footer">
-                            <div class="footer-dates">
-                                <strong>EMITIDO:</strong> {{ $item['fechaEmision'] }} &nbsp;|&nbsp;
-                                <strong>VÁLIDO HASTA:</strong> {{ $item['fechaVencimiento'] }}
-                            </div>
-                            <div class="footer-slogan">Excelencia Académica</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            @if($index % 2 == 1 || $index == count($carnetes) - 1)
-        </div>
-        @endif
-
-        @if(($index + 1) % 8 == 0 && $index + 1 < count($carnetes))
-            <div class="page-break">
-    </div>
-    @endif
-    @endforeach
-    </div>
 </body>
-
 </html>

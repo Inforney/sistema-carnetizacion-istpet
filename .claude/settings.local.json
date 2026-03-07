@@ -3,7 +3,11 @@
     "allow": [
       "Bash(php:*)",
       "Bash(dir:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(git checkout:*)",
+      "Bash(ls \"C:\\\\xampp\\\\htdocs\\\\carnetizacion-istpet\\\\resources\\\\views\\\\admin\\\\carnets\"\" 2>&1 && echo \"---\" && ls \"C:xampphtdocscarnetizacion-istpetresourcesviewscarnets\"\")",
+      "Bash(Get-ChildItem -Recurse C:xampphtdocscarnetizacion-istpetappHttpControllers -Filter \"AccesoController.php\")",
+      "Bash(Select-Object FullName)"
     ]
   }
 }

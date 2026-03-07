@@ -29,8 +29,14 @@ class DashboardController extends Controller
         // Solicitudes pendientes
         $solicitudesPendientes = SolicitudPassword::where('estado', 'pendiente')->count();
 
-        // Laboratorios con ocupación
-        $laboratorios = Laboratorio::where('estado', 'activo')->get();
+        // Laboratorios con ocupación precalculada (evitar N+1 en la vista)
+        $laboratorios = Laboratorio::where('estado', 'activo')
+            ->withCount(['accesos as ocupacion_hoy' => function ($q) {
+                $q->whereNull('hora_salida')
+                    ->where('marcado_ausente', false)
+                    ->whereDate('fecha_entrada', today());
+            }])
+            ->get();
 
         // Últimos 10 accesos registrados
         $ultimosAccesos = Acceso::with(['usuario', 'laboratorio'])

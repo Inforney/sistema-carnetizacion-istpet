@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Usuario;
 use App\Models\Carnet;
+use App\Models\Profesor;
+use App\Models\SolicitudPassword;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -18,7 +20,8 @@ class EstudianteController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Usuario::where('tipo_usuario', 'estudiante')->with('carnet');
+        // Incluir graduados: su historial se preserva y son visibles en la lista
+        $query = Usuario::whereIn('tipo_usuario', ['estudiante', 'graduado'])->with('carnet');
 
         // Búsqueda
         if ($request->filled('buscar')) {
@@ -33,6 +36,11 @@ class EstudianteController extends Controller
         // Filtro por estado
         if ($request->filled('estado')) {
             $query->where('estado', $request->estado);
+        }
+
+        // Filtro por rol
+        if ($request->filled('rol')) {
+            $query->where('tipo_usuario', $request->rol);
         }
 
         $estudiantes = $query->orderBy('apellidos')->paginate(20);
@@ -107,7 +115,7 @@ class EstudianteController extends Controller
                     'usuario_id' => $usuario->id,
                     'codigo_qr' => $codigoQr,
                     'fecha_emision' => Carbon::now(),
-                    'fecha_vencimiento' => Carbon::now()->addYears(4),
+                    'fecha_vencimiento' => Carbon::now()->addMonths(6),
                     'estado' => 'activo',
                 ]);
             }
@@ -138,7 +146,18 @@ class EstudianteController extends Controller
             'ultimo_acceso' => $estudiante->accesos()->latest('fecha_entrada')->first(),
         ];
 
-        return view('admin.estudiantes.show', compact('estudiante', 'stats'));
+        // Solicitudes de cambio de contraseña de este estudiante
+        $solicitudes = SolicitudPassword::where('usuario_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        // Contraseña temporal conocida (solo si password_temporal = true)
+        $passwordConocida = $estudiante->password_temporal
+            ? 'ISTPET' . substr($estudiante->cedula, -4)
+            : null;
+
+        return view('admin.estudiantes.show', compact('estudiante', 'stats', 'solicitudes', 'passwordConocida'));
     }
 
     /**
@@ -208,6 +227,11 @@ class EstudianteController extends Controller
     {
         $estudiante = Usuario::findOrFail($id);
 
+        // No permitir cambiar estado de un graduado (ya es profesor)
+        if ($estudiante->tipo_usuario === 'graduado') {
+            return redirect()->back()->with('error', 'No se puede cambiar el estado de un graduado. Gestiona su cuenta desde el módulo de Profesores.');
+        }
+
         $nuevoEstado = $estudiante->estado === 'activo' ? 'bloqueado' : 'activo';
         $estudiante->update(['estado' => $nuevoEstado]);
 
@@ -250,13 +274,12 @@ class EstudianteController extends Controller
     }
 
     /**
-     * Resetear contraseña de estudiante
+     * Resetear contraseña de estudiante y generar enlace WhatsApp
      */
     public function resetPassword($id)
     {
         $estudiante = Usuario::findOrFail($id);
 
-        // Generar contraseña temporal
         $passwordTemp = 'ISTPET' . substr($estudiante->cedula, -4);
 
         $estudiante->update([
@@ -264,10 +287,20 @@ class EstudianteController extends Controller
             'password_temporal' => true,
         ]);
 
-        return redirect()->back()->with(
-            'success',
-            'Contraseña reseteada. Nueva contraseña temporal: ' . $passwordTemp
-        );
+        // Generar enlace WhatsApp con el mensaje pre-escrito
+        $telefono = $estudiante->celular;
+        $telefonoIntl = '593' . ltrim($telefono, '0'); // Ecuador: 593 + número sin 0
+        $mensaje = "Hola {$estudiante->nombreCompleto}, el administrador del Sistema ISTPET ha restablecido tu contraseña.\n\nNueva contraseña temporal: *{$passwordTemp}*\n\nIngresa al sistema y cámbiala de inmediato.\n" . config('app.url');
+        $waLink = 'https://wa.me/' . $telefonoIntl . '?text=' . urlencode($mensaje);
+
+        return redirect()->back()
+            ->with('success', "Contraseña reseteada para {$estudiante->nombreCompleto}. Contraseña temporal: {$passwordTemp}")
+            ->with('whatsapp', [
+                'nombre' => $estudiante->nombreCompleto,
+                'telefono' => $telefono,
+                'password' => $passwordTemp,
+                'link' => $waLink,
+            ]);
     }
 
     /**
@@ -300,5 +333,81 @@ class EstudianteController extends Controller
                 'apellidos' => $est->apellidos,
             ];
         }));
+    }
+
+    /**
+     * Promover estudiante a profesor (transición de rol)
+     */
+    public function promoverAProfesor(Request $request, $id)
+    {
+        $estudiante = Usuario::findOrFail($id);
+
+        $request->validate([
+            'correo'        => 'required|email|max:100|unique:profesores,correo',
+            'celular'       => 'required|string|size:10',
+            'especialidad'  => 'nullable|string|max:150',
+            'departamento'  => 'nullable|string|max:100',
+            'fecha_ingreso' => 'nullable|date',
+            'horario'       => 'nullable|string|max:200',
+        ], [
+            'correo.unique' => 'Este correo ya está registrado como correo de otro profesor.',
+            'celular.size'  => 'El celular debe tener exactamente 10 dígitos.',
+        ]);
+
+        // Verificar que no exista ya como profesor (seguridad extra)
+        if (Profesor::where('cedula', $estudiante->cedula)->exists()) {
+            return back()->with('error', 'Ya existe un profesor con la cédula ' . $estudiante->cedula . '.');
+        }
+
+        // Auto-generar contraseña temporal: ISTPET + últimos 4 dígitos de cédula
+        $passwordTemp = 'ISTPET' . substr($estudiante->cedula, -4);
+
+        DB::beginTransaction();
+        try {
+            // 1. Marcar al estudiante como graduado e inactivo
+            $estudiante->update([
+                'tipo_usuario' => 'graduado',
+                'estado'       => 'inactivo',
+            ]);
+
+            // 2. Crear la cuenta de profesor con todos los datos
+            $profesor = Profesor::create([
+                'nombres'           => $estudiante->nombres,
+                'apellidos'         => $estudiante->apellidos,
+                'cedula'            => $estudiante->cedula,
+                'correo'            => $request->correo,
+                'celular'           => $request->celular,
+                'especialidad'      => $request->especialidad,
+                'departamento'      => $request->departamento,
+                'fecha_ingreso'     => $request->fecha_ingreso,
+                'horario'           => $request->horario,
+                'estado'            => 'activo',
+                'password'          => Hash::make($passwordTemp),
+                'password_temporal' => true,
+            ]);
+
+            DB::commit();
+
+            // Generar enlace WhatsApp
+            $telefono = $request->celular;
+            $telefonoIntl = '593' . ltrim($telefono, '0');
+            $nombre = $estudiante->nombres . ' ' . $estudiante->apellidos;
+            $mensaje = "Hola {$nombre}, el administrador del Sistema ISTPET ha creado tu cuenta de docente.\n\nContraseña temporal: *{$passwordTemp}*\n\nIngresa al sistema con tu cédula y esta contraseña. Deberás cambiarla al iniciar sesión.\n" . config('app.url');
+            $waLink = 'https://wa.me/' . $telefonoIntl . '?text=' . urlencode($mensaje);
+
+            return redirect()
+                ->route('admin.profesores.show', $profesor->id)
+                ->with('success', "{$nombre} ha sido promovido a profesor. Contraseña temporal: {$passwordTemp}")
+                ->with('whatsapp', [
+                    'nombre'   => $nombre,
+                    'telefono' => $telefono,
+                    'password' => $passwordTemp,
+                    'link'     => $waLink,
+                ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Error al promover: ' . $e->getMessage());
+        }
     }
 }

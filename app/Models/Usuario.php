@@ -29,6 +29,8 @@ class Usuario extends Authenticatable
         'reset_token',
         'reset_token_expira',
         'fecha_registro',
+        'password_temporal',
+        'semestre',
     ];
 
     protected $hidden = [
@@ -37,8 +39,9 @@ class Usuario extends Authenticatable
     ];
 
     protected $casts = [
-        'fecha_registro' => 'datetime',
+        'fecha_registro'     => 'datetime',
         'reset_token_expira' => 'datetime',
+        'password_temporal'  => 'boolean',
     ];
 
     /**

@@ -24,10 +24,27 @@
 
         body {
             font-family: 'Open Sans', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(160deg, #222C57 0%, #1a2342 60%, #111829 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(196,168,87,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(196,168,87,0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 1;
         }
 
         h1,
@@ -40,16 +57,25 @@
         }
 
         .navbar {
-            background-color: var(--istpet-azul) !important;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: rgba(0,0,0,0.25) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(196,168,87,0.2);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
         }
 
         .navbar-brand {
             font-family: 'Oswald', sans-serif;
             font-weight: 700;
-            color: var(--istpet-dorado) !important;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            text-decoration: none;
         }
+
+        .brand-ist { color: var(--istpet-dorado) !important; }
+        .brand-sep { color: var(--istpet-dorado) !important; margin: 0 4px; opacity: 0.7; }
+        .brand-name { color: #ffffff !important; font-size: 1rem; letter-spacing: 0.5px; }
 
         .main-content {
             flex: 1;
@@ -59,8 +85,34 @@
 
         .card {
             border: none;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            border-top: 3px solid var(--istpet-dorado);
+        }
+
+        .card-header-brand {
+            background: linear-gradient(135deg, var(--istpet-azul) 0%, #1a2342 100%);
+            color: white;
+            border-radius: 13px 13px 0 0 !important;
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 3px solid var(--istpet-dorado);
+        }
+
+        .card-header-brand .brand-title {
+            font-family: 'Oswald', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white;
+            margin: 0.5rem 0 0.25rem;
+        }
+
+        .card-header-brand .brand-subtitle {
+            color: var(--istpet-dorado);
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 600;
         }
 
         .btn-primary {
@@ -74,15 +126,20 @@
         }
 
         footer {
-            background-color: rgba(0, 0, 0, 0.2);
-            color: white;
-            padding: 20px 0;
+            background-color: rgba(0,0,0,0.3);
+            border-top: 1px solid rgba(196,168,87,0.2);
+            color: rgba(255,255,255,0.7);
+            padding: 15px 0;
             margin-top: auto;
+            position: relative;
+            z-index: 1;
         }
 
         .slogan {
             font-style: italic;
-            opacity: 0.8;
+            color: var(--istpet-dorado);
+            opacity: 0.85;
+            font-size: 0.85rem;
         }
     </style>
 
@@ -94,9 +151,10 @@
     <nav class="navbar navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="{{ route('login') }}">
-                🎓 ISTPET
+                <span class="brand-ist">IST</span><span class="brand-sep">|</span><span class="brand-ist">PET</span>
+                <span class="brand-name ms-2">TECNOLÓGICO TRAVERSARI</span>
             </a>
-            <span class="navbar-text text-white">
+            <span class="navbar-text text-white opacity-75" style="font-size:0.85rem;">
                 Sistema de Carnetización
             </span>
         </div>

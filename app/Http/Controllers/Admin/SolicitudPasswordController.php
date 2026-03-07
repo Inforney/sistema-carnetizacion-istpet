@@ -40,9 +40,10 @@ class SolicitudPasswordController extends Controller
         // Generar contraseña temporal
         $passwordTemporal = 'ISTPET' . substr($solicitud->usuario->cedula, -4);
 
-        // Actualizar contraseña del usuario
+        // Actualizar contraseña del usuario + marcar como temporal
         $solicitud->usuario->update([
-            'password' => Hash::make($passwordTemporal),
+            'password'          => Hash::make($passwordTemporal),
+            'password_temporal' => true,
         ]);
 
         // Marcar solicitud como atendida
@@ -52,29 +53,21 @@ class SolicitudPasswordController extends Controller
             'notas_admin' => 'Contraseña temporal generada: ' . $passwordTemporal,
         ]);
 
-        // Intentar enviar correo (si falla, continúa igual)
-        try {
-            Mail::raw(
-                "Hola {$solicitud->usuario->nombreCompleto},\n\n" .
-                    "Tu solicitud de cambio de contraseña ha sido atendida.\n\n" .
-                    "Tu nueva contraseña temporal es: {$passwordTemporal}\n\n" .
-                    "Por favor inicia sesión y cámbiala por una contraseña segura.\n\n" .
-                    "Saludos,\nAdministración ISTPET",
-                function ($message) use ($solicitud) {
-                    $message->to($solicitud->correo)
-                        ->subject('Recuperación de Contraseña - ISTPET');
-                }
-            );
+        // Generar enlace WhatsApp
+        $telefono    = $solicitud->usuario->celular;
+        $telefonoIntl = '593' . ltrim($telefono, '0');
+        $nombre      = $solicitud->usuario->nombreCompleto;
+        $mensaje     = "Hola {$nombre}, el administrador del Sistema ISTPET ha restablecido tu contraseña.\n\nNueva contraseña temporal: *{$passwordTemporal}*\n\nIngresa al sistema y cámbiala de inmediato.\n" . config('app.url');
+        $waLink      = 'https://wa.me/' . $telefonoIntl . '?text=' . urlencode($mensaje);
 
-            $mensajeCorreo = ' Se ha enviado un correo con la contraseña temporal.';
-        } catch (\Exception $e) {
-            $mensajeCorreo = '';
-        }
-
-        return back()->with(
-            'success',
-            "Solicitud atendida. Nueva contraseña temporal: {$passwordTemporal}.{$mensajeCorreo} Informa al estudiante."
-        );
+        return back()
+            ->with('success', "Solicitud atendida. Contraseña temporal: {$passwordTemporal}. El estudiante deberá cambiarla al iniciar sesión.")
+            ->with('whatsapp', [
+                'nombre'   => $nombre,
+                'telefono' => $telefono,
+                'password' => $passwordTemporal,
+                'link'     => $waLink,
+            ]);
     }
 
     /**

@@ -192,10 +192,10 @@
                                 <strong>{{ $acceso->profesor->nombres }} {{ $acceso->profesor->apellidos }}</strong>
                             </td>
                         </tr>
-                        @if($acceso->profesor->correo_institucional)
+                        @if($acceso->profesor->correo)
                         <tr>
                             <td class="text-muted">Email Profesor:</td>
-                            <td>{{ $acceso->profesor->correo_institucional }}</td>
+                            <td>{{ $acceso->profesor->correo }}</td>
                         </tr>
                         @endif
                     </table>

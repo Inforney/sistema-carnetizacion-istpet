@@ -4,29 +4,36 @@
 
 @section('content')
 <div class="container-fluid py-4">
-    {{-- Saludo --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2>¡Bienvenido, Admin! 👋</h2>
-            <p class="text-muted mb-0">Panel de control del administrador</p>
+    {{-- Encabezado con separador de marca --}}
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+            <div>
+                <h2 class="mb-1" style="font-family:'Oswald',sans-serif; color:var(--istpet-azul); font-size:1.6rem;">
+                    <i class="bi bi-speedometer2 me-2" style="color:var(--istpet-dorado);"></i>
+                    Panel de Administración
+                </h2>
+                <p class="text-muted mb-0" style="font-size:0.88rem;">Control general del sistema &mdash; {{ \Carbon\Carbon::now()->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</p>
+            </div>
+            <span class="badge px-3 py-2" style="background:var(--istpet-azul); font-family:'Oswald',sans-serif; font-size:0.8rem; letter-spacing:0.5px;">
+                <i class="bi bi-shield-fill me-1" style="color:var(--istpet-dorado);"></i>ADMINISTRADOR
+            </span>
         </div>
-        <div class="text-end">
-            <small class="text-muted">{{ date('l, d F Y') }}</small>
-        </div>
+        {{-- Separador de marca --}}
+        <div class="mt-3" style="height:3px; background:linear-gradient(90deg, var(--istpet-dorado) 0%, var(--istpet-azul) 60%, transparent 100%); border-radius:2px;"></div>
     </div>
 
     {{-- Estadísticas Principales --}}
     <div class="row mb-4">
         <div class="col-md-3">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm stat-card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted mb-1">Total Estudiantes</h6>
-                            <h3 class="mb-0">{{ $totalEstudiantes }}</h3>
+                            <h6 class="text-muted mb-1" style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.5px;">Total Estudiantes</h6>
+                            <h2 class="mb-0 fw-bold" style="color:var(--istpet-azul);">{{ $totalEstudiantes }}</h2>
                         </div>
-                        <div class="text-primary">
-                            <i class="bi bi-people display-4"></i>
+                        <div class="stat-icon">
+                            <i class="bi bi-people"></i>
                         </div>
                     </div>
                 </div>
@@ -34,15 +41,15 @@
         </div>
 
         <div class="col-md-3">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm stat-card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted mb-1">Carnets Activos</h6>
-                            <h3 class="mb-0">{{ $carnetsActivos }}</h3>
+                            <h6 class="text-muted mb-1" style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.5px;">Carnets Activos</h6>
+                            <h2 class="mb-0 fw-bold" style="color:var(--istpet-azul);">{{ $carnetsActivos }}</h2>
                         </div>
-                        <div class="text-success">
-                            <i class="bi bi-credit-card display-4"></i>
+                        <div class="stat-icon">
+                            <i class="bi bi-credit-card"></i>
                         </div>
                     </div>
                 </div>
@@ -50,15 +57,15 @@
         </div>
 
         <div class="col-md-3">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm stat-card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted mb-1">En Laboratorios</h6>
-                            <h3 class="mb-0">{{ $estudiantesEnLabs }}</h3>
+                            <h6 class="text-muted mb-1" style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.5px;">En Laboratorios</h6>
+                            <h2 class="mb-0 fw-bold" style="color:var(--istpet-azul);">{{ $estudiantesEnLabs }}</h2>
                         </div>
-                        <div class="text-warning">
-                            <i class="bi bi-building display-4"></i>
+                        <div class="stat-icon">
+                            <i class="bi bi-building"></i>
                         </div>
                     </div>
                 </div>
@@ -66,15 +73,15 @@
         </div>
 
         <div class="col-md-3">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm stat-card" style="border-top-color:var(--istpet-dorado)!important;">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="text-muted mb-1">Solicitudes Pendientes</h6>
-                            <h3 class="mb-0">{{ $solicitudesPendientes }}</h3>
+                            <h6 class="text-muted mb-1" style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.5px;">Solicitudes Pendientes</h6>
+                            <h2 class="mb-0 fw-bold" style="color:var(--istpet-dorado);">{{ $solicitudesPendientes }}</h2>
                         </div>
-                        <div class="text-danger">
-                            <i class="bi bi-envelope display-4"></i>
+                        <div class="stat-icon" style="color:var(--istpet-dorado);background:rgba(196,168,87,0.1);">
+                            <i class="bi bi-envelope"></i>
                         </div>
                     </div>
                 </div>
@@ -86,65 +93,65 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header" style="background: #1a2342;">
+                <div class="card-header bg-istpet">
                     <h5 class="mb-0 text-white">
-                        <i class="bi bi-lightning-fill me-2"></i>Acciones Rápidas
+                        <i class="bi bi-lightning-fill me-2" style="color:var(--istpet-dorado);"></i>Acciones Rápidas
                     </h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="background:rgba(34,44,87,0.03);">
                     <div class="row g-3">
                         <div class="col-md-3">
-                            <a href="{{ route('admin.estudiantes.create') }}" class="btn btn-outline-primary w-100 py-3">
-                                <i class="bi bi-person-plus d-block mb-2" style="font-size: 2rem;"></i>
+                            <a href="{{ route('admin.estudiantes.create') }}" class="btn action-btn w-100 py-3 text-decoration-none">
+                                <i class="bi bi-person-plus d-block mb-2" style="font-size:2rem;"></i>
                                 <strong>Nuevo Estudiante</strong>
                             </a>
                         </div>
                         <div class="col-md-3">
-                            <a href="{{ route('admin.carnets.create') }}" class="btn btn-outline-success w-100 py-3">
-                                <i class="bi bi-credit-card d-block mb-2" style="font-size: 2rem;"></i>
+                            <a href="{{ route('admin.carnets.create') }}" class="btn action-btn gold w-100 py-3 text-decoration-none">
+                                <i class="bi bi-credit-card d-block mb-2" style="font-size:2rem;"></i>
                                 <strong>Generar Carnet</strong>
                             </a>
                         </div>
                         <div class="col-md-3">
-                            <a href="{{ route('admin.profesores.index') }}" class="btn btn-outline-info w-100 py-3">
-                                <i class="bi bi-person-workspace d-block mb-2" style="font-size: 2rem;"></i>
+                            <a href="{{ route('admin.profesores.index') }}" class="btn action-btn w-100 py-3 text-decoration-none">
+                                <i class="bi bi-person-workspace d-block mb-2" style="font-size:2rem;"></i>
                                 <strong>Gestionar Profesores</strong>
                             </a>
                         </div>
                         <div class="col-md-3">
-                            <a href="{{ route('admin.laboratorios.index') }}" class="btn btn-outline-warning w-100 py-3">
-                                <i class="bi bi-building d-block mb-2" style="font-size: 2rem;"></i>
+                            <a href="{{ route('admin.laboratorios.index') }}" class="btn action-btn w-100 py-3 text-decoration-none">
+                                <i class="bi bi-building d-block mb-2" style="font-size:2rem;"></i>
                                 <strong>Gestionar Laboratorios</strong>
                             </a>
                         </div>
                     </div>
 
                     {{-- Segunda fila de acciones --}}
-                    <div class="row g-3 mt-2">
+                    <div class="row g-3 mt-1">
                         <div class="col-md-3">
-                            <a href="{{ route('admin.accesos.estadisticas') }}" class="btn btn-outline-primary w-100 py-3">
-                                <i class="bi bi-graph-up d-block mb-2" style="font-size: 2rem;"></i>
+                            <a href="{{ route('admin.accesos.estadisticas') }}" class="btn action-btn w-100 py-3 text-decoration-none">
+                                <i class="bi bi-graph-up d-block mb-2" style="font-size:2rem;"></i>
                                 <strong>Ver Estadísticas</strong>
                                 <small class="d-block text-muted mt-1">Reportes y gráficas</small>
                             </a>
                         </div>
                         <div class="col-md-3">
-                            <a href="{{ route('admin.importacion.index') }}" class="btn btn-outline-danger w-100 py-3">
-                                <i class="bi bi-file-earmark-excel d-block mb-2" style="font-size: 2rem;"></i>
+                            <a href="{{ route('admin.importacion.index') }}" class="btn action-btn gold w-100 py-3 text-decoration-none">
+                                <i class="bi bi-file-earmark-excel d-block mb-2" style="font-size:2rem;"></i>
                                 <strong>Importación Masiva</strong>
                                 <small class="d-block text-muted mt-1">Subir Excel</small>
                             </a>
                         </div>
                         <div class="col-md-3">
-                            <a href="{{ route('admin.carnets.index') }}" class="btn btn-outline-secondary w-100 py-3">
-                                <i class="bi bi-credit-card-2-front d-block mb-2" style="font-size: 2rem;"></i>
+                            <a href="{{ route('admin.carnets.index') }}" class="btn action-btn w-100 py-3 text-decoration-none">
+                                <i class="bi bi-credit-card-2-front d-block mb-2" style="font-size:2rem;"></i>
                                 <strong>Ver Carnets</strong>
                                 <small class="d-block text-muted mt-1">Todos los carnets</small>
                             </a>
                         </div>
                         <div class="col-md-3">
-                            <a href="{{ route('admin.solicitudes.index') }}" class="btn btn-outline-secondary w-100 py-3">
-                                <i class="bi bi-envelope-paper d-block mb-2" style="font-size: 2rem;"></i>
+                            <a href="{{ route('admin.solicitudes.index') }}" class="btn action-btn w-100 py-3 text-decoration-none">
+                                <i class="bi bi-envelope-paper d-block mb-2" style="font-size:2rem;"></i>
                                 <strong>Solicitudes</strong>
                                 <small class="d-block text-muted mt-1">Gestionar solicitudes</small>
                             </a>
@@ -159,7 +166,7 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header" style="background: #1a2342;">
+                <div class="card-header bg-istpet">
                     <h5 class="mb-0 text-white">
                         <i class="bi bi-building me-2"></i>Estado de Laboratorios
                     </h5>
@@ -168,11 +175,7 @@
                     <div class="row">
                         @foreach($laboratorios as $lab)
                         @php
-                        $ocupacion = \App\Models\Acceso::where('laboratorio_id', $lab->id)
-                        ->whereNull('hora_salida')
-                        ->where('marcado_ausente', false)
-                        ->whereDate('fecha_entrada', today())
-                        ->count();
+                        $ocupacion = $lab->ocupacion_hoy ?? 0;
                         $porcentaje = $lab->capacidad > 0 ? round(($ocupacion / $lab->capacidad) * 100) : 0;
                         @endphp
                         <div class="col-md-4 mb-3">
@@ -184,12 +187,12 @@
                                         <span class="small">Ocupación:</span>
                                         <strong>{{ $ocupacion }}/{{ $lab->capacidad }}</strong>
                                     </div>
-                                    <div class="progress mb-3" style="height: 20px;">
-                                        <div class="progress-bar {{ $porcentaje > 80 ? 'bg-danger' : ($porcentaje > 50 ? 'bg-warning' : 'bg-success') }}"
-                                            style="width: {{ $porcentaje }}%">
-                                            {{ $porcentaje }}%
+                                    <div class="progress mb-3" style="height: 12px; border-radius:6px;">
+                                        <div class="progress-bar"
+                                            style="width:{{ $porcentaje }}%; background-color:{{ $porcentaje > 80 ? '#dc3545' : ($porcentaje > 50 ? 'var(--istpet-dorado)' : 'var(--istpet-azul)') }}; border-radius:6px;">
                                         </div>
                                     </div>
+                                    <small class="text-muted d-block mb-2" style="font-size:0.75rem;">{{ $porcentaje }}% ocupado</small>
                                     <a href="{{ route('admin.accesos.estudiantes-lab', $lab->id) }}"
                                         class="btn btn-sm btn-primary w-100">
                                         <i class="bi bi-people me-2"></i>Ver Estudiantes
@@ -228,9 +231,9 @@
                                     <small>{{ date('H:i', strtotime($acceso->hora_entrada)) }}</small>
                                     <br>
                                     @if($acceso->hora_salida)
-                                    <span class="badge bg-success">Completado</span>
+                                    <span class="badge badge-istpet">Completado</span>
                                     @else
-                                    <span class="badge bg-warning">En curso</span>
+                                    <span class="badge badge-gold">En curso</span>
                                     @endif
                                 </div>
                             </div>
