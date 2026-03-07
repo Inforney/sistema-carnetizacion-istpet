@@ -278,9 +278,9 @@ php artisan db:seed
 
 Esto creará:
 
-- 2 administradores
+- 1 administradores
 - 1 estudiante de prueba (Kevin - CI: 1726429283)
-- 6 laboratorios (3 técnicos + 3 aulas)
+- 2 laboratorios 
 
 ### **8. Crear Enlace Simbólico para Storage**
 
@@ -311,44 +311,17 @@ http://127.0.0.1:8000
 ---
 
 ## 👥 Credenciales de Acceso
-
-<<<<<<< HEAD
+### **Administrador Principal**
 - Usuario: `admin`
 - Contraseña: `IstpetAdmin2026!`
-=======
-### **Administrador Principal**
->>>>>>> develop
 
-```
-Usuario: admin
-Contraseña: admin123
-```
-
-<<<<<<< HEAD
+**Perfil de Profesor**
 - Usuario: `1711223344`
 - Contraseña: `Profesor2026!`
-=======
-### **Administrador Secundario**
->>>>>>> develop
 
-```
-Usuario: carlos
-Contraseña: admin123
-```
-
-<<<<<<< HEAD
+### **Perfil Estudiante**
 - Cédula: `1726429283`
 - Contraseña: `28112000k`
-=======
-### **Estudiante de Prueba**
-
-```
-Cédula: 1726429283
-Contraseña: estudiante123
-```
-
----
->>>>>>> develop
 
 ## 📂 Estructura del Proyecto
 
@@ -460,10 +433,6 @@ carnetizacion-istpet/
 ## 📄 Licencia
 
 Este proyecto fue desarrollado como proyecto académico para ISTPET.
-
-=======
->>>>>>> develop
----
 
 ## 🔄 Comandos Artisan Personalizados
 
