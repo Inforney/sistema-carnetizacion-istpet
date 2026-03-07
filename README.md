@@ -1,3 +1,4 @@
+# NO ESTA ACTUALIZADO 07/03/2026
 # 🎓 Sistema de Carnetización y Control de Accesos - ISTPET
 
 Sistema web completo desarrollado en Laravel 10 para la gestión integral de carnets digitales, control de accesos a laboratorios e importación masiva de estudiantes del Instituto Superior Tecnológico Mayor Pedro Traversari.
