@@ -196,6 +196,24 @@ class AccesoController extends Controller
         $laboratorios = Laboratorio::where('estado', 'activo')->orderBy('nombre')->get();
         $profesores   = Profesor::where('estado', 'activo')->orderBy('apellidos')->get();
 
+        // Mapa de hora_salida máxima por (laboratorio + día)
+        // Permite distinguir "salida temprana real" de "cierre de sala por el profesor"
+        $maxSalidaQuery = Acceso::selectRaw('laboratorio_id, DATE(fecha_entrada) as dia, MAX(hora_salida) as max_salida')
+            ->whereNotNull('hora_salida');
+        if ($request->filled('laboratorio_id')) {
+            $maxSalidaQuery->where('laboratorio_id', $request->laboratorio_id);
+        }
+        if ($request->filled('fecha_desde')) {
+            $maxSalidaQuery->whereDate('fecha_entrada', '>=', $request->fecha_desde);
+        }
+        if ($request->filled('fecha_hasta')) {
+            $maxSalidaQuery->whereDate('fecha_entrada', '<=', $request->fecha_hasta);
+        }
+        $maxSalidaPorSesion = $maxSalidaQuery
+            ->groupBy('laboratorio_id', 'dia')
+            ->get()
+            ->mapWithKeys(fn($row) => [$row->laboratorio_id . '_' . $row->dia => $row->max_salida]);
+
         // Estadísticas del resultado filtrado (sin paginar)
         $stats = [
             'total'         => $accesos->total(),
@@ -212,7 +230,7 @@ class AccesoController extends Controller
                                      ->whereDate('fecha_entrada', '<', today())->count(),
         ];
 
-        return view('profesor.accesos.historial', compact('accesos', 'laboratorios', 'profesores', 'stats'));
+        return view('profesor.accesos.historial', compact('accesos', 'laboratorios', 'profesores', 'stats', 'maxSalidaPorSesion'));
     }
 
     /**

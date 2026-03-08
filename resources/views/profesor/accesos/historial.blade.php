@@ -148,7 +148,15 @@
                             $dur = $acceso->hora_salida
                                 ? \Carbon\Carbon::parse($acceso->hora_entrada)->diffInMinutes(\Carbon\Carbon::parse($acceso->hora_salida))
                                 : null;
-                            $esSalidaTemprana = $dur !== null && $dur < 30 && !$acceso->marcado_ausente;
+
+                            // Detectar si el estudiante salió al momento del cierre de sala
+                            // (su hora_salida está dentro de 2 min de la salida máxima de ese lab+día)
+                            $sesionKey   = $acceso->laboratorio_id . '_' . \Carbon\Carbon::parse($acceso->fecha_entrada)->toDateString();
+                            $maxSalida   = $maxSalidaPorSesion[$sesionKey] ?? null;
+                            $salioAlCierre = $maxSalida && $acceso->hora_salida
+                                && \Carbon\Carbon::parse($acceso->hora_salida)->diffInMinutes(\Carbon\Carbon::parse($maxSalida), true) <= 2;
+
+                            $esSalidaTemprana = $dur !== null && $dur < 30 && !$acceso->marcado_ausente && !$salioAlCierre;
                             $esSinSalida = !$acceso->hora_salida && !$acceso->marcado_ausente && ($acceso->fecha_entrada < today()->toDateString());
                         @endphp
                         <tr class="

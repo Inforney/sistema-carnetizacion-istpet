@@ -232,6 +232,8 @@
                                     <br>
                                     @if($acceso->hora_salida)
                                     <span class="badge badge-istpet">Completado</span>
+                                    @elseif($acceso->marcado_ausente)
+                                    <span class="badge bg-danger">Ausente</span>
                                     @else
                                     <span class="badge badge-gold">En curso</span>
                                     @endif

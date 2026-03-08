@@ -312,17 +312,21 @@ http://127.0.0.1:8000
 ---
 
 ## 👥 Credenciales de Acceso
+
 ### **Administrador Principal**
 - Usuario: `admin`
 - Contraseña: `IstpetAdmin2026!`
+- URL: `/admin/login`
 
-**Perfil de Profesor**
-- Usuario: `1711223344`
-- Contraseña: `Profesor2026!`
+### **Perfil Profesor**
+- Cédula: `1726429283`
+- Contraseña: `KevinHuilca1@`
+- URL: `/profesor/login`
 
 ### **Perfil Estudiante**
-- Cédula: `1726429283`
+- Cédula: `1753855517`
 - Contraseña: `28112000k`
+- URL: `/login`
 
 ## 📂 Estructura del Proyecto
 
@@ -417,7 +421,6 @@ carnetizacion-istpet/
 └── README.md                                   # Este archivo
 ```
 
-<<<<<<< HEAD
 ## 🔐 Seguridad
 
 - Contraseñas encriptadas con Bcrypt

@@ -167,6 +167,8 @@
                                     <td>
                                         @if($acceso->duracion_formateada)
                                         <span class="badge bg-info">{{ $acceso->duracion_formateada }}</span>
+                                        @elseif($acceso->marcado_ausente)
+                                        <span class="badge bg-danger">Ausente</span>
                                         @else
                                         <span class="text-muted">En curso</span>
                                         @endif

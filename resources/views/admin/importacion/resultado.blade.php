@@ -141,7 +141,12 @@
                             <td><span class="badge bg-secondary">{{ $duplicado['fila'] }}</span></td>
                             <td>{{ $duplicado['nombre'] }}</td>
                             <td>{{ $duplicado['cedula'] }}</td>
-                            <td><span class="badge bg-warning text-dark">Ya existe en BD</span></td>
+                            <td>
+                                @php $motivo = $duplicado['motivo'] ?? 'Ya existe en BD'; @endphp
+                                <span class="badge {{ str_contains($motivo, 'profesor') ? 'bg-danger' : 'bg-warning text-dark' }}">
+                                    {{ $motivo }}
+                                </span>
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>

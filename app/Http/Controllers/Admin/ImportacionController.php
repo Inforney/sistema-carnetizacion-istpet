@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Usuario;
 use App\Models\Carnet;
+use App\Models\Profesor;
 use App\Helpers\CedulaValidator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -160,13 +161,25 @@ class ImportacionController extends Controller
                     continue;
                 }
 
-                // VERIFICAR DUPLICADOS
+                // VERIFICAR DUPLICADOS (en usuarios Y en profesores)
                 $existente = Usuario::where('cedula', $datos['cedula'])->first();
                 if ($existente) {
                     $resultados['duplicados'][] = [
-                        'fila' => $numeroFila,
+                        'fila'   => $numeroFila,
                         'cedula' => $datos['cedula'],
                         'nombre' => $datos['nombres'] . ' ' . $datos['apellidos'],
+                        'motivo' => 'Ya existe como estudiante',
+                    ];
+                    continue;
+                }
+
+                $esProfesor = Profesor::where('cedula', $datos['cedula'])->exists();
+                if ($esProfesor) {
+                    $resultados['duplicados'][] = [
+                        'fila'   => $numeroFila,
+                        'cedula' => $datos['cedula'],
+                        'nombre' => $datos['nombres'] . ' ' . $datos['apellidos'],
+                        'motivo' => 'Ya existe como profesor',
                     ];
                     continue;
                 }
@@ -212,7 +225,7 @@ class ImportacionController extends Controller
                     'foto_url' => $fotoPath,
                     'tipo_usuario' => 'estudiante',
                     'estado' => 'activo',
-                    'password' => Hash::make('estudiante123'),
+                    'password' => Hash::make('ISTPET' . substr($datos['cedula'], -4)),
                     'password_temporal' => 1,
                 ]);
 

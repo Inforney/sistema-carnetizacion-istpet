@@ -101,37 +101,72 @@ class CarnetController extends Controller
     }
 
     /**
-     * Generar carnets masivos con transacción
+     * Generar carnets masivos con transacción.
+     * Crea carnets para estudiantes sin ninguno Y renueva los carnets vencidos del período anterior.
+     * Los carnets bloqueados NO se renuevan automáticamente.
      */
     public function generarMasivo()
     {
-        $estudiantesSinCarnet = Usuario::where('tipo_usuario', 'estudiante')
-            ->whereDoesntHave('carnet')
+        $ahora     = Carbon::now();
+        $finPeriodo = self::calcularFinPeriodoAcademico($ahora);
+
+        // Estudiantes elegibles:
+        // 1) Sin ningún carnet
+        // 2) Con carnet vencido (fecha_vencimiento < hoy) y NO bloqueado
+        $estudiantes = Usuario::where('tipo_usuario', 'estudiante')
+            ->where(function ($q) {
+                $q->whereDoesntHave('carnet')
+                  ->orWhereHas('carnet', function ($q2) {
+                      $q2->where('estado', '!=', 'bloqueado')
+                         ->where('fecha_vencimiento', '<', today());
+                  });
+            })
+            ->with('carnet')
             ->get();
 
-        if ($estudiantesSinCarnet->count() === 0) {
-            return back()->with('info', 'Todos los estudiantes ya tienen carnet asignado.');
+        if ($estudiantes->count() === 0) {
+            return back()->with('info', 'Todos los estudiantes ya tienen carnet activo y vigente para este período.');
         }
 
-        $generados = 0;
+        $creados   = 0;
+        $renovados = 0;
 
-        DB::transaction(function () use ($estudiantesSinCarnet, &$generados) {
-            foreach ($estudiantesSinCarnet as $estudiante) {
-                $codigoQr = 'ISTPET-' . Carbon::now()->year . '-' . strtoupper($estudiante->cedula);
+        DB::transaction(function () use ($estudiantes, $ahora, $finPeriodo, &$creados, &$renovados) {
+            foreach ($estudiantes as $estudiante) {
+                $codigoQr = 'ISTPET-' . $ahora->year . '-' . strtoupper($estudiante->cedula);
 
-                Carnet::create([
-                    'usuario_id'        => $estudiante->id,
-                    'codigo_qr'         => $codigoQr,
-                    'fecha_emision'     => Carbon::now(),
-                    'fecha_vencimiento' => self::calcularFinPeriodoAcademico(Carbon::now()),
-                    'estado'            => 'activo',
-                ]);
-
-                $generados++;
+                if ($estudiante->carnet) {
+                    // Renovar carnet vencido existente
+                    $estudiante->carnet->update([
+                        'codigo_qr'         => $codigoQr,
+                        'fecha_emision'     => $ahora,
+                        'fecha_vencimiento' => $finPeriodo,
+                        'estado'            => 'activo',
+                    ]);
+                    $renovados++;
+                } else {
+                    // Crear carnet nuevo
+                    Carnet::create([
+                        'usuario_id'        => $estudiante->id,
+                        'codigo_qr'         => $codigoQr,
+                        'fecha_emision'     => $ahora,
+                        'fecha_vencimiento' => $finPeriodo,
+                        'estado'            => 'activo',
+                    ]);
+                    $creados++;
+                }
             }
         });
 
-        return back()->with('success', "Se generaron {$generados} carnets exitosamente.");
+        [$nombrePeriodo, $fechaFin] = self::infoPeridoAcademico($ahora);
+
+        $msg = [];
+        if ($creados > 0)   $msg[] = "{$creados} carnets nuevos creados";
+        if ($renovados > 0) $msg[] = "{$renovados} carnets renovados";
+
+        return back()->with('success',
+            implode(' y ', $msg) . ". Período: {$nombrePeriodo} — vence el {$fechaFin}."
+        );
     }
 
     /**

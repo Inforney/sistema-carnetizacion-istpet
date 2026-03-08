@@ -381,6 +381,7 @@ class EstudianteController extends Controller
                 'departamento'      => $request->departamento,
                 'fecha_ingreso'     => $request->fecha_ingreso,
                 'horario'           => $request->horario,
+                'foto_url'          => $estudiante->foto_url,
                 'estado'            => 'activo',
                 'password'          => Hash::make($passwordTemp),
                 'password_temporal' => true,
